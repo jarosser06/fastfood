@@ -1,14 +1,17 @@
 package cookbook
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"text/template"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/jarosser06/fastfood/pkg/util"
 )
 
 type OSTarget struct {
@@ -58,8 +61,14 @@ func (c *Cookbook) GenFiles() error {
 			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
 		}
 
-		// TODO: Need to clean up newlines before the file gets written
-		t.Execute(f, c)
+		// Write template output to a buffer
+		var buffer bytes.Buffer
+		t.Execute(&buffer, c)
+
+		// Clean up rendered templates and write to file
+		cleanStr := util.CollapseNewlines(buffer.String())
+		io.WriteString(f, cleanStr)
+
 		f.Close()
 	}
 
