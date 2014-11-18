@@ -3,7 +3,7 @@ export RICEBIN := ${GOPATH}/bin/rice
 
 all: deps build
 
-build: rice
+build:
 		@echo "Building binary..."
 		scripts/make.sh build
 
@@ -14,9 +14,7 @@ rice:
 		@echo "Compiling templates..."
 		go get github.com/GeertJohan/go.rice/rice
 		go install github.com/GeertJohan/go.rice/rice
-		${RICEBIN} -i ./fastfood/application clean
 		${RICEBIN} -i ./fastfood/cookbook clean
-		${RICEBIN} -i ./fastfood/application embed-go
 		${RICEBIN} -i ./fastfood/cookbook embed-go
 
 test:
