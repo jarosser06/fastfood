@@ -1,6 +1,26 @@
 package cmd
 
+import "strings"
+
 type Generator struct {
+	MappedArgs map[string]string
+}
+
+// Translates key:value strings into a map
+func MapArgs(args []string) map[string]string {
+	var argMap map[string]string
+	argMap = make(map[string]string)
+
+	for _, arg := range args {
+		if strings.Contains(arg, ":") {
+			// Split at the first : in an arg
+			splitArg := strings.SplitN(arg, ":", 2)
+
+			argMap[splitArg[0]] = splitArg[1]
+		}
+	}
+
+	return argMap
 }
 
 func (g *Generator) Help() string {
