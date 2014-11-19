@@ -1,6 +1,11 @@
 package cmd
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/jarosser06/fastfood/pkg/cookbook"
+)
 
 type Generator struct {
 	MappedArgs map[string]string
@@ -28,6 +33,12 @@ func (g *Generator) Help() string {
 }
 
 func (g *Generator) Run(args []string) int {
+	if cookbook.CWDIsCookbook() {
+		// Call NewCookbook within this path
+	} else {
+		fmt.Println("You must run this command from a cookbook directory")
+		return 1
+	}
 	return 0
 }
 
