@@ -107,7 +107,7 @@ func (c *Cookbook) GenDirs() error {
 func CWDIsCookbook() bool {
 	workingDir, _ := os.Getwd()
 
-	_, err := os.Stat(path.Join(workingDir, "metatdata.rb"))
+	_, err := os.Stat(path.Join(workingDir, "metadata.rb"))
 	if err == nil {
 		return true
 	} else {
