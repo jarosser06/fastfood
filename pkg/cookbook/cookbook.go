@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strings"
 	"text/template"
 	"time"
 
@@ -44,7 +45,7 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 	var cookbook Cookbook
 
 	if PathIsCookbook(cookbookPath) {
-		f, err := os.Open(path.Join(cookbookPath, "metatdata.rb"))
+		f, err := os.Open(path.Join(cookbookPath, "metadata.rb"))
 
 		if err != nil {
 			return cookbook, errors.New(
@@ -63,10 +64,13 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 		for scanner.Scan() {
 			switch {
 			case depFlag:
-				cookbook.Dependencies = append(cookbook.Dependencies, scanner.Text())
+				cookbook.Dependencies = append(
+					cookbook.Dependencies,
+					strings.Trim(scanner.Text(), "'"),
+				)
 				depFlag = false
 			case nameFlag:
-				cookbook.Name = scanner.Text()
+				cookbook.Name = strings.Trim(scanner.Text(), "'")
 				nameFlag = false
 			case scanner.Text() == "depends":
 				depFlag = true

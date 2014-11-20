@@ -37,7 +37,14 @@ func (g *Generator) Run(args []string) int {
 	workingDir, _ := os.Getwd()
 
 	if cookbook.PathIsCookbook(workingDir) {
-		// Call NewCookbook within this path
+		ckbk, err := cookbook.NewCookbookFromPath(workingDir)
+
+		if err != nil {
+			fmt.Println("Unable to parse cookbook")
+			return 1
+		}
+
+		//TODO: Implement things
 	} else {
 		fmt.Println("You must run this command from a cookbook directory")
 		return 1
