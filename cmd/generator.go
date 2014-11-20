@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/jarosser06/fastfood/pkg/cookbook"
@@ -33,7 +34,9 @@ func (g *Generator) Help() string {
 }
 
 func (g *Generator) Run(args []string) int {
-	if cookbook.CWDIsCookbook() {
+	workingDir, _ := os.Getwd()
+
+	if cookbook.PathIsCookbook(workingDir) {
 		// Call NewCookbook within this path
 	} else {
 		fmt.Println("You must run this command from a cookbook directory")

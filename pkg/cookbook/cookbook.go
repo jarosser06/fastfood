@@ -1,6 +1,7 @@
 package cookbook
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -36,6 +37,63 @@ func NewCookbook(cookbookPath string, name string) Cookbook {
 	}
 
 	return cookbook
+}
+
+// Given a cookbook path, return a cookbook struct pre-populated
+func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
+	var cookbook Cookbook
+
+	if PathIsCookbook(cookbookPath) {
+		f, err := os.Open(path.Join(cookbookPath, "metatdata.rb"))
+
+		if err != nil {
+			return cookbook, errors.New(
+				fmt.Sprintf("cookbook.NewCookbookFromPath: %v", err),
+			)
+		}
+
+		defer f.Close()
+
+		scanner := bufio.NewScanner(f)
+		scanner.Split(bufio.ScanWords)
+
+		depFlag := false
+		nameFlag := false
+
+		for scanner.Scan() {
+			switch {
+			case depFlag:
+				cookbook.Dependencies = append(cookbook.Dependencies, scanner.Text())
+				depFlag = false
+			case nameFlag:
+				cookbook.Name = scanner.Text()
+				nameFlag = false
+			case scanner.Text() == "depends":
+				depFlag = true
+			case scanner.Text() == "name":
+				nameFlag = true
+			}
+		}
+
+		if !(len(cookbook.Name) > 0) {
+			return cookbook, errors.New("unable to determine cookbook name")
+		}
+
+		return cookbook, nil
+	} else {
+		return cookbook, errors.New(
+			fmt.Sprintf("%s is not a cookbook", cookbookPath),
+		)
+	}
+}
+
+func PathIsCookbook(cookbookPath string) bool {
+	_, err := os.Stat(path.Join(cookbookPath, "metadata.rb"))
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (c *Cookbook) GenFiles() error {
@@ -102,15 +160,4 @@ func (c *Cookbook) GenDirs() error {
 	}
 
 	return nil
-}
-
-func CWDIsCookbook() bool {
-	workingDir, _ := os.Getwd()
-
-	_, err := os.Stat(path.Join(workingDir, "metadata.rb"))
-	if err == nil {
-		return true
-	} else {
-		return false
-	}
 }
