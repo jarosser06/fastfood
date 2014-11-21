@@ -12,6 +12,11 @@ type Generator struct {
 	MappedArgs map[string]string
 }
 
+func GenApp(args map[string]string) {
+	fmt.Println("Shit works")
+	//TODO: Implement Application Generation code
+}
+
 // Translates key:value strings into a map
 func MapArgs(args []string) map[string]string {
 	var argMap map[string]string
@@ -44,7 +49,19 @@ func (g *Generator) Run(args []string) int {
 			return 1
 		}
 
-		//TODO: Implement things
+		// Map the specific gen function to the passed arg
+		mappedArgs := MapArgs(args)
+		genCommands := map[string]interface{}{
+			"app": GenApp,
+		}
+
+		// Attempt to call the command function if it exists
+		if com, ok := genCommands[args[0]]; ok {
+			com.(func(map[string]string))(mappedArgs)
+		} else {
+			fmt.Printf("No generator for %s\n", args[0])
+		}
+
 	} else {
 		fmt.Println("You must run this command from a cookbook directory")
 		return 1
