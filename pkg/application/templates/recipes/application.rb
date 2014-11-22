@@ -1,7 +1,7 @@
 application '{{ .Name }}' do
   path '{{ .Path }}'
-  owner 'www-data'
-  group 'www-data'
+  owner '{{ .Owner }}'
+  group '{{ .Owner }}'
   repository '{{ .Repo }}'
-  revision 'master'
+  revision '{{ .Branch }}'
 end

@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	defaultBranch    = "master"
 	defaultRoot      = "/var/www"
 	defaultType      = "generic"
 	defaultOwner     = "node['apache']['user']"
@@ -23,6 +24,7 @@ const (
 )
 
 type Application struct {
+	Branch    string `json:"branch,omitempty"`
 	Cookbook  cookbook.Cookbook
 	Name      string `json:"name,omitempty"`
 	Owner     string `json:"owner,omitempty"`
@@ -36,6 +38,7 @@ type Application struct {
 func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 
 	return Application{
+		Branch:    defaultBranch,
 		Cookbook:  ckbk,
 		Name:      name,
 		Owner:     defaultOwner,
@@ -53,8 +56,8 @@ func (a *Application) Path() string {
 func (a *Application) GenFiles() error {
 
 	cookbookFiles := map[string]string{
-		fmt.Sprintf("%s.rb", a.Name):      "recipes/application.rb",
-		fmt.Sprintf("%s_spec.rb", a.Name): "test/unit/spec/application_spec.rb",
+		fmt.Sprintf("recipes/%s.rb", a.Name):             "recipes/application.rb",
+		fmt.Sprintf("test/unit/spec/%s_spec.rb", a.Name): "test/unit/spec/application_spec.rb",
 	}
 
 	templateBox, _ := rice.FindBox("templates")
@@ -75,5 +78,25 @@ func (a *Application) GenFiles() error {
 		cleanStr := util.CollapseNewlines(buffer.String())
 		io.WriteString(f, cleanStr)
 	}
+	return nil
+}
+
+func (a *Application) GenDirs() error {
+	dirs := [2]string{
+		"recipes",
+		"test/unit/spec",
+	}
+
+	for _, dir := range dirs {
+		fullPath := path.Join(a.Cookbook.Path, dir)
+
+		if !util.FileExist(fullPath) {
+			err := os.MkdirAll(path.Join(a.Cookbook.Path, dir), 0755)
+			if err != nil {
+				return errors.New(fmt.Sprintf("application.GenDirs(): %v", err))
+			}
+		}
+	}
+
 	return nil
 }
