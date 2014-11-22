@@ -8,7 +8,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/jarosser06/fastfood/pkg/util"
+	"github.com/jarosser06/fastfood/util"
 )
 
 const (

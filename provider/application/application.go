@@ -54,10 +54,18 @@ func (a *Application) Path() string {
 }
 
 func (a *Application) GenFiles() error {
+	recipeFile := fmt.Sprintf("recipes/%s.rb", a.Name)
+
+	// Return error if Application already exists
+	if util.FileExist(path.Join(a.Cookbook.Path, recipeFile)) {
+		return errors.New(fmt.Sprintf("%s already exists", recipeFile))
+	}
+
+	specFile := fmt.Sprintf("test/unit/spec/%s_spec.rb", a.Name)
 
 	cookbookFiles := map[string]string{
-		fmt.Sprintf("recipes/%s.rb", a.Name):             "recipes/application.rb",
-		fmt.Sprintf("test/unit/spec/%s_spec.rb", a.Name): "test/unit/spec/application_spec.rb",
+		recipeFile: "recipes/application.rb",
+		specFile:   "test/unit/spec/application_spec.rb",
 	}
 
 	templateBox, _ := rice.FindBox("../templates/application")
