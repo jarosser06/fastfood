@@ -47,6 +47,14 @@ func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 	}
 }
 
+func (a *Application) QString(str string) string {
+	if util.IsNodeAttr(str) {
+		return str
+	} else {
+		return fmt.Sprintf("'%s'", str)
+	}
+}
+
 func (a *Application) Path() string {
 	return path.Join(a.Root, a.Name)
 }
@@ -64,6 +72,8 @@ func (a *Application) GenFiles() error {
 		partialStr, _ := templateBox.String("partials/site_setup.rb")
 
 		t, err := template.NewTemplate(cookbookFile, a, tmpStr, partialStr)
+
+		fmt.Println(a.Name)
 
 		if err != nil {
 			return errors.New(fmt.Sprintf("Error creating template: %v", err))

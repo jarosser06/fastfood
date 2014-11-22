@@ -54,7 +54,5 @@ func (t *Template) Flush(fileName string) error {
 
 // Helper calls util.CollapseNewlines on template string
 func (t *Template) CleanNewlines() {
-	fmt.Println(t.Content)
 	t.Content = util.CollapseNewlines(t.Content)
-	fmt.Println(t.Content)
 }

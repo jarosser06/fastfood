@@ -9,6 +9,26 @@ https://github.com/pote/gpm
 
 ###Notes
 
+Template Notes
+```
+If the variable in the template can be either a node attribute
+or a string you can ensure the file will be formatted correctly
+using the .QString method on the variable.
+
+Example:
+template |{ .QString .Name }| do
+
+if .Name is a node attribute such as node['mycookbook']['myname']
+then it will be written as such:
+
+template node['mycookbook']['myname'] do
+
+if .Name is a string such as templatename then it will be written
+with single quotes around it:
+
+template 'templatename' do
+```
+
 CLI Options
 ```shell
 fastfood new 123456-customer

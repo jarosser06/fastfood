@@ -1,7 +1,7 @@
 |{ define "ApacheSite" }|
-web_app |{ .Name }| do
-  cookbook |{ .Cookbook.Name }|
-  docroot |{ .Path }|
+  web_app |{ .QString .Name }| do
+  cookbook |{ .QString .Cookbook.Name }|
+    docroot |{ .QString .Path }|
   enable true
 end
 |{ end }|
@@ -17,7 +17,7 @@ template site_conf do
   notifies :reload, 'service[nginx]'
 end
 
-nginx_site |{ .Name }| do
+nginx_site |{ .QString .Name }| do
   action enable
 end
 |{ end }|
