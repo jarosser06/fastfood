@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: {{.Name}}
+# Cookbook Name:: |{.Name}|
 # Recipe :: default
 #
-# Copyright {{ .Year }}, Rackspace
+# Copyright |{ .Year }|, Rackspace
 #

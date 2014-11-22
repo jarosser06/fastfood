@@ -2,18 +2,15 @@ package cookbook
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/pkg/util"
+	"github.com/jarosser06/fastfood/pkg/template"
 )
 
 type OSTarget struct {
@@ -116,22 +113,16 @@ func (c *Cookbook) GenFiles() error {
 	templateBox, _ := rice.FindBox("templates")
 	for _, cookbookFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(cookbookFile)
-		t, _ := template.New(cookbookFile).Parse(tmpStr)
 
-		f, err := os.Create(path.Join(c.Path, cookbookFile))
+		t, err := template.NewTemplate(cookbookFile, c, tmpStr)
 		if err != nil {
 			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
 		}
 
-		// Write template output to a buffer
-		var buffer bytes.Buffer
-		t.Execute(&buffer, c)
-
-		// Clean up rendered templates and write to file
-		cleanStr := util.CollapseNewlines(buffer.String())
-		io.WriteString(f, cleanStr)
-
-		f.Close()
+		t.CleanNewlines()
+		if err := t.Flush(path.Join(c.Path, cookbookFile)); err != nil {
+			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
+		}
 	}
 
 	return nil
