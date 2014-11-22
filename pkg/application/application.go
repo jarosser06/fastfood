@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultBranch    = "master"
+	defaultRevision  = "master"
 	defaultRoot      = "/var/www"
 	defaultType      = "generic"
 	defaultOwner     = "node['apache']['user']"
@@ -22,11 +22,11 @@ const (
 )
 
 type Application struct {
-	Branch    string `json:"branch,omitempty"`
 	Cookbook  cookbook.Cookbook
 	Name      string `json:"name,omitempty"`
 	Owner     string `json:"owner,omitempty"`
 	Repo      string `json:"repo,omitempty"`
+	Revision  string `json:"revision,omitempty"`
 	Root      string `json:"docroot,omitempty"`
 	Type      string `json:"type,omitempty"`
 	Webserver string `json:"webserver,omitempty"`
@@ -36,11 +36,11 @@ type Application struct {
 func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 
 	return Application{
-		Branch:    defaultBranch,
 		Cookbook:  ckbk,
 		Name:      name,
 		Owner:     defaultOwner,
 		Repo:      defaultRepo,
+		Revision:  defaultRevision,
 		Root:      defaultRoot,
 		Type:      defaultType,
 		Webserver: defaultWebserver,

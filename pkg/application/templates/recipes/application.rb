@@ -16,7 +16,7 @@ application '|{ .Name }|' do
   owner '|{ .Owner }|'
   group '|{ .Owner }|'
   repository '|{ .Repo }|'
-  revision '|{ .Branch }|'
+  revision '|{ .Revision }|'
 end
 
 |{ if eq .Webserver "apache" }|
