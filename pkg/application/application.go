@@ -24,7 +24,6 @@ const (
 
 type Application struct {
 	Cookbook  cookbook.Cookbook
-	Path      string `json:"name,omitempty"`
 	Name      string `json:"name,omitempty"`
 	Owner     string `json:"owner,omitempty"`
 	Repo      string `json:"repo,omitempty"`
@@ -38,7 +37,6 @@ func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 
 	return Application{
 		Cookbook:  ckbk,
-		Path:      path.Join(defaultRoot, name),
 		Name:      name,
 		Owner:     defaultOwner,
 		Repo:      defaultRepo,
@@ -48,10 +46,8 @@ func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 	}
 }
 
-// Using set root also updates the Path variable
-func (a *Application) SetRoot(root string) {
-	a.Root = root
-	a.Path = path.Join(root, a.Name)
+func (a *Application) Path() string {
+	return path.Join(a.Root, a.Name)
 }
 
 func (a *Application) GenFiles() error {
