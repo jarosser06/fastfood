@@ -20,7 +20,7 @@ const (
 	defaultType      = "generic"
 	defaultOwner     = "node['apache']['user']"
 	defaultWebserver = "apache"
-	defaultRepo      = "github.com/jarosser06/magic"
+	defaultRepo      = "git@github.com/jarosser06/magic"
 )
 
 type Application struct {
@@ -63,7 +63,13 @@ func (a *Application) GenFiles() error {
 	templateBox, _ := rice.FindBox("templates")
 	for cookbookFile, templateFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(templateFile)
-		t, _ := template.New(templateFile).Parse(tmpStr)
+		partialStr, _ := templateBox.String("partials/site_setup.rb")
+
+		t := template.New(templateFile)
+		t.Delims("|{", "}|")
+		t.Parse(tmpStr)
+
+		t.Parse(partialStr)
 
 		f, err := os.Create(path.Join(a.Cookbook.Path, cookbookFile))
 		defer f.Close()
