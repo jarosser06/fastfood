@@ -30,3 +30,13 @@ func CollapseNewlines(str string) string {
 
 	return reg.ReplaceAllString(str, "\n\n")
 }
+
+func FileExist(filePath string) bool {
+	_, err := os.Stat(filePath)
+
+	if err == nil {
+		return true
+	} else {
+		return false
+	}
+}
