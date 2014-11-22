@@ -44,3 +44,25 @@ func TestIsNodeAttr(t *testing.T) {
 		t.Errorf("Expected %s to return false", testNotMatch)
 	}
 }
+
+func TestFormatStrings(t *testing.T) {
+	type TestStruct struct {
+		NodeAttribute string
+		RegString     string
+	}
+
+	tempStruct := TestStruct{
+		NodeAttribute: "node['cookbook']['attr']",
+		RegString:     "somestring",
+	}
+
+	FormatStrings(&tempStruct)
+
+	if tempStruct.RegString != "'somestring'" {
+		t.Errorf("Expected somestring to be changed to 'somestring'")
+	}
+
+	if tempStruct.NodeAttribute != "node['cookbook']['attr']" {
+		t.Errorf("Expected a node attribute not to change")
+	}
+}
