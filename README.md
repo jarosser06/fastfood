@@ -12,7 +12,7 @@ https://github.com/pote/gpm
 Template Notes
 ```
 If the variable in the template can be either a node attribute
-or a string you can ensure the file will be formatted correctly
+or a string you can ensure the value will be formatted correctly
 using the .QString method on the variable.
 
 Example:
