@@ -8,6 +8,7 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/jarosser06/fastfood/pkg/cookbook"
+	"github.com/jarosser06/fastfood/pkg/helpers"
 	"github.com/jarosser06/fastfood/pkg/template"
 	"github.com/jarosser06/fastfood/pkg/util"
 )
@@ -22,6 +23,7 @@ const (
 )
 
 type Application struct {
+	*helpers.Template
 	Cookbook  cookbook.Cookbook
 	Name      string `json:"name,omitempty"`
 	Owner     string `json:"owner,omitempty"`
@@ -47,14 +49,6 @@ func NewApplication(name string, ckbk cookbook.Cookbook) Application {
 	}
 }
 
-func (a *Application) QString(str string) string {
-	if util.IsNodeAttr(str) {
-		return str
-	} else {
-		return fmt.Sprintf("'%s'", str)
-	}
-}
-
 func (a *Application) Path() string {
 	return path.Join(a.Root, a.Name)
 }
@@ -66,14 +60,12 @@ func (a *Application) GenFiles() error {
 		fmt.Sprintf("test/unit/spec/%s_spec.rb", a.Name): "test/unit/spec/application_spec.rb",
 	}
 
-	templateBox, _ := rice.FindBox("templates")
+	templateBox, _ := rice.FindBox("app_templates")
 	for cookbookFile, templateFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(templateFile)
 		partialStr, _ := templateBox.String("partials/site_setup.rb")
 
 		t, err := template.NewTemplate(cookbookFile, a, tmpStr, partialStr)
-
-		fmt.Println(a.Name)
 
 		if err != nil {
 			return errors.New(fmt.Sprintf("Error creating template: %v", err))
@@ -84,7 +76,6 @@ func (a *Application) GenFiles() error {
 		if err := t.Flush(path.Join(a.Cookbook.Path, cookbookFile)); err != nil {
 			return errors.New(fmt.Sprintf("Error writing file: %v", err))
 		}
-
 	}
 	return nil
 }

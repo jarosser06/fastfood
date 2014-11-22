@@ -11,7 +11,7 @@ node.default['nginx']['default_site_enabled'] = false
 include_recipe 'nginx'
 |{ end }|
 
-  application |{ .QString .Name }| do
+application |{ .QString .Name }| do
   path |{ .QString .Path }|
   owner |{ .QString .Owner }|
   group |{ .QString .Owner }|

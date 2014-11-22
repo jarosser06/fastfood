@@ -1,7 +1,7 @@
 |{ define "ApacheSite" }|
-  web_app |{ .QString .Name }| do
+web_app |{ .QString .Name }| do
   cookbook |{ .QString .Cookbook.Name }|
-    docroot |{ .QString .Path }|
+  docroot |{ .QString .Path }|
   enable true
 end
 |{ end }|
