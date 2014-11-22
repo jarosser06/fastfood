@@ -151,13 +151,11 @@ func (c *Cookbook) GenDirs() error {
 		"recipes",
 		"resources",
 		"templates",
-		"test",
-		"test/unit",
 		"test/unit/spec",
 	}
 
 	for _, dir := range dirs {
-		err := os.Mkdir(path.Join(c.Path, dir), 0755)
+		err := os.MkdirAll(path.Join(c.Path, dir), 0755)
 		if err != nil {
 			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
 		}
