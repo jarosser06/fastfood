@@ -1,16 +1,14 @@
 package application
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
-	"text/template"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/jarosser06/fastfood/pkg/cookbook"
+	"github.com/jarosser06/fastfood/pkg/template"
 	"github.com/jarosser06/fastfood/pkg/util"
 )
 
@@ -65,24 +63,18 @@ func (a *Application) GenFiles() error {
 		tmpStr, _ := templateBox.String(templateFile)
 		partialStr, _ := templateBox.String("partials/site_setup.rb")
 
-		t := template.New(templateFile)
-		t.Delims("|{", "}|")
-		t.Parse(tmpStr)
-
-		t.Parse(partialStr)
-
-		f, err := os.Create(path.Join(a.Cookbook.Path, cookbookFile))
-		defer f.Close()
+		t, err := template.NewTemplate(cookbookFile, a, tmpStr, partialStr)
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("application.GenFiles(): %v", err))
+			return errors.New(fmt.Sprintf("Error creating template: %v", err))
 		}
 
-		var buffer bytes.Buffer
-		t.Execute(&buffer, a)
+		t.CleanNewlines()
 
-		cleanStr := util.CollapseNewlines(buffer.String())
-		io.WriteString(f, cleanStr)
+		if err := t.Flush(path.Join(a.Cookbook.Path, cookbookFile)); err != nil {
+			return errors.New(fmt.Sprintf("Error writing file: %v", err))
+		}
+
 	}
 	return nil
 }
