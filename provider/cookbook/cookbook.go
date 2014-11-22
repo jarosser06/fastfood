@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/pkg/helpers"
-	"github.com/jarosser06/fastfood/pkg/template"
+	"github.com/jarosser06/fastfood/helpers"
+	"github.com/jarosser06/fastfood/template"
 )
 
 type OSTarget struct {
@@ -112,7 +112,7 @@ func (c *Cookbook) GenFiles() error {
 		"test/unit/spec/spec_helper.rb",
 	}
 
-	templateBox, _ := rice.FindBox("cook_templates")
+	templateBox, _ := rice.FindBox("../templates/cookbook")
 	for _, cookbookFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(cookbookFile)
 

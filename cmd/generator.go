@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/jarosser06/fastfood/pkg/application"
-	"github.com/jarosser06/fastfood/pkg/cookbook"
+	"github.com/jarosser06/fastfood/provider/application"
+	"github.com/jarosser06/fastfood/provider/cookbook"
 	"github.com/mitchellh/mapstructure"
 )
 

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/jarosser06/fastfood/pkg/cookbook"
+	"github.com/jarosser06/fastfood/provider/cookbook"
 )
 
 type Builder struct {

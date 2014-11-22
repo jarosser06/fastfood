@@ -7,10 +7,10 @@ import (
 	"path"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/pkg/cookbook"
-	"github.com/jarosser06/fastfood/pkg/helpers"
-	"github.com/jarosser06/fastfood/pkg/template"
-	"github.com/jarosser06/fastfood/pkg/util"
+	"github.com/jarosser06/fastfood/helpers"
+	"github.com/jarosser06/fastfood/provider/cookbook"
+	"github.com/jarosser06/fastfood/template"
+	"github.com/jarosser06/fastfood/util"
 )
 
 const (
@@ -60,7 +60,7 @@ func (a *Application) GenFiles() error {
 		fmt.Sprintf("test/unit/spec/%s_spec.rb", a.Name): "test/unit/spec/application_spec.rb",
 	}
 
-	templateBox, _ := rice.FindBox("app_templates")
+	templateBox, _ := rice.FindBox("../templates/application")
 	for cookbookFile, templateFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(templateFile)
 		partialStr, _ := templateBox.String("partials/site_setup.rb")

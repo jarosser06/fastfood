@@ -3,7 +3,7 @@ package helpers
 import (
 	"fmt"
 
-	"github.com/jarosser06/fastfood/pkg/util"
+	"github.com/jarosser06/fastfood/util"
 )
 
 type Template struct {

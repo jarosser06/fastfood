@@ -14,10 +14,10 @@ rice:
 		@echo "Compiling templates..."
 		go get github.com/GeertJohan/go.rice/rice
 		go install github.com/GeertJohan/go.rice/rice
-		${RICEBIN} -i ./pkg/cookbook clean
-		${RICEBIN} -i ./pkg/cookbook embed-go
-		${RICEBIN} -i ./pkg/application clean
-		${RICEBIN} -i ./pkg/application embed-go
+		${RICEBIN} -i ./provider/cookbook clean
+		${RICEBIN} -i ./provider/cookbook embed-go
+		${RICEBIN} -i ./provider/application clean
+		${RICEBIN} -i ./provider/application embed-go
 
 test:
 		@echo "Running tests..."
