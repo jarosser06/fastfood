@@ -5,15 +5,19 @@ import (
 	"os"
 	"strings"
 
+	"github.com/jarosser06/fastfood/pkg/application"
 	"github.com/jarosser06/fastfood/pkg/cookbook"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Generator struct {
 	MappedArgs map[string]string
 }
 
-func GenApp(args map[string]string) {
-	fmt.Println("Shit works")
+func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
+	app := application.NewApplication("app", ckbk)
+
+	mapstructure.Decode(args, &app)
 	//TODO: Implement Application Generation code
 }
 
@@ -55,9 +59,11 @@ func (g *Generator) Run(args []string) int {
 			"app": GenApp,
 		}
 
+		// Remove the first arg as the command
+		genCommand, args := args[0], args[1:len(args)]
 		// Attempt to call the command function if it exists
-		if com, ok := genCommands[args[0]]; ok {
-			com.(func(map[string]string))(mappedArgs)
+		if com, ok := genCommands[genCommand]; ok {
+			com.(func(cookbook.Cookbook, map[string]string))(ckbk, mappedArgs)
 		} else {
 			fmt.Printf("No generator for %s\n", args[0])
 		}
