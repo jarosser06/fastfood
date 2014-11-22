@@ -18,7 +18,14 @@ func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
 	app := application.NewApplication("app", ckbk)
 
 	mapstructure.Decode(args, &app)
-	//TODO: Implement Application Generation code
+
+	if err := app.GenDirs(); err != nil {
+		fmt.Printf("Error creating dirs: %v\n", err)
+	}
+
+	if err := app.GenFiles(); err != nil {
+		fmt.Printf("Error creating application: %v\n", err)
+	}
 }
 
 // Translates key:value strings into a map
