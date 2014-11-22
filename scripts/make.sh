@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkg_dirs="util cookbook config"
+pkg_dirs="util cookbook config application"
 
 case $1 in
 "test")
