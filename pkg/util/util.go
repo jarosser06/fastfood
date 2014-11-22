@@ -40,3 +40,9 @@ func FileExist(filePath string) bool {
 		return false
 	}
 }
+
+func IsNodeAttr(str string) bool {
+	reg, _ := regexp.Compile(`^node((\[\'([\w_-]+)\'\])+)`)
+
+	return reg.MatchString(str)
+}

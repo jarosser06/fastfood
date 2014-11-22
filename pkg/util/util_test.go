@@ -18,3 +18,16 @@ func TestCollapseNewlines(t *testing.T) {
 		t.Errorf("Expected new string to contain two newlines")
 	}
 }
+
+func TestIsNodeAttr(t *testing.T) {
+	testMatch := "node['cookbook']['attr']"
+	testNotMatch := "something[diff]"
+
+	if !IsNodeAttr(testMatch) {
+		t.Errorf("Expected %s to return true", testMatch)
+	}
+
+	if IsNodeAttr(testNotMatch) {
+		t.Errorf("Expected %s to return false", testNotMatch)
+	}
+}
