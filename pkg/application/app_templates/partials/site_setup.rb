@@ -9,7 +9,7 @@ end
 |{ define "NginxSite" }|
 site_conf = ::File.join(node['nginx']['dir'],
                         'sites-available',
-                        |{ .Name }|)
+                        |{ .QString .Name }|)
 
 template site_conf do
   source "|{ .Name }|.nginx.erb"
