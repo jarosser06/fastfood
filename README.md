@@ -33,9 +33,9 @@ CLI Options
 ```shell
 fastfood new 123456-customer
 
-fastfood gen app application1 type:python repo:git@github.com/cus/app1
+fastfood gen app name:application1 type:python repo:git@github.com/cus/app1
 
-fastfood gen db mysql_master database:appdb
+fastfood gen db name:mysql_master database:appdb
 ```
 
 Set configs, global being the default and then allow for overrides.
