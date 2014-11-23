@@ -53,6 +53,10 @@ func (a *Application) Path() string {
 	return path.Join(a.Root, a.Name)
 }
 
+func (a *Application) Dependencies() []string {
+	return []string{"application"}
+}
+
 func (a *Application) GenFiles() error {
 	recipeFile := fmt.Sprintf("recipes/%s.rb", a.Name)
 

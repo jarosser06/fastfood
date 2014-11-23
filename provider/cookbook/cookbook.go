@@ -12,6 +12,7 @@ import (
 	"github.com/GeertJohan/go.rice"
 	"github.com/jarosser06/fastfood/helpers"
 	"github.com/jarosser06/fastfood/template"
+	"github.com/jarosser06/fastfood/util"
 )
 
 type OSTarget struct {
@@ -155,4 +156,27 @@ func (c *Cookbook) GenDirs() error {
 	}
 
 	return nil
+}
+
+func (c *Cookbook) AppendDependencies(dependencies []string) {
+	var depBuffer []string
+	for _, dep := range dependencies {
+		exist := false
+
+		for _, existing := range c.Dependencies {
+			if existing == dep {
+				exist = true
+				continue
+			}
+		}
+
+		if !exist {
+			depBuffer = append(depBuffer, fmt.Sprintf("depends '%s'", dep))
+		}
+	}
+
+	util.AppendFile(
+		path.Join(c.Path, "metadata.rb"),
+		strings.Join(depBuffer, "\n"),
+	)
 }

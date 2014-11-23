@@ -26,6 +26,8 @@ func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
 	if err := app.GenFiles(); err != nil {
 		fmt.Printf("Error creating application: %v\n", err)
 	}
+
+	app.Cookbook.AppendDependencies(app.Dependencies())
 }
 
 // Translates key:value strings into a map
