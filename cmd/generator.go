@@ -7,6 +7,7 @@ import (
 
 	"github.com/jarosser06/fastfood/provider/application"
 	"github.com/jarosser06/fastfood/provider/cookbook"
+	"github.com/jarosser06/fastfood/provider/database"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -15,7 +16,7 @@ type Generator struct {
 }
 
 func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
-	app := application.NewApplication("app", ckbk)
+	app := application.New("app", ckbk)
 
 	mapstructure.Decode(args, &app)
 
@@ -28,6 +29,22 @@ func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
 	}
 
 	app.Cookbook.AppendDependencies(app.Dependencies())
+}
+
+func GenDB(ckbk cookbook.Cookbook, args map[string]string) {
+	db := database.New("db", ckbk)
+
+	mapstructure.Decode(args, &db)
+
+	if err := db.GenDirs(); err != nil {
+		fmt.Printf("Error creating dirs: %v\n", err)
+	}
+
+	if err := db.GenFiles(); err != nil {
+		fmt.Printf("Error creating database: %v\n", err)
+	}
+
+	db.Cookbook.AppendDependencies(db.Dependencies())
 }
 
 // Translates key:value strings into a map
@@ -66,6 +83,7 @@ func (g *Generator) Run(args []string) int {
 		mappedArgs := MapArgs(args)
 		genCommands := map[string]interface{}{
 			"app": GenApp,
+			"db":  GenDB,
 		}
 
 		// Remove the first arg as the command
