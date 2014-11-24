@@ -35,7 +35,7 @@ type Application struct {
 }
 
 // Return an application with the defaults
-func NewApplication(name string, ckbk cookbook.Cookbook) Application {
+func New(name string, ckbk cookbook.Cookbook) Application {
 
 	return Application{
 		Cookbook:  ckbk,
