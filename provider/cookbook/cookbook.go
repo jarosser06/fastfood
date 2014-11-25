@@ -42,7 +42,7 @@ func NewCookbook(cookbookPath string, name string) Cookbook {
 
 // Given a cookbook path, return a cookbook struct pre-populated
 func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
-	var cookbook Cookbook
+	cookbook := Cookbook{Year: time.Now().Year()}
 
 	if PathIsCookbook(cookbookPath) {
 		f, err := os.Open(path.Join(cookbookPath, "metadata.rb"))
