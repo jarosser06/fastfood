@@ -7,6 +7,10 @@ ensure that it is installed in order to build from source.
 
 https://github.com/pote/gpm
 
+###Known um ... Issues
+Passing node attributes does work ... however you need to escape the
+' chars in order to insure it populates the recipe correctly.
+
 ###Notes
 
 Template Notes
