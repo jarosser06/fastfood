@@ -22,6 +22,7 @@ type Database struct {
 	Cookbook cookbook.Cookbook
 	Database string `json:"database,omitempty"`
 	Name     string `json:"name,omitempty"`
+	Openfor  string `json:"openfor,omitempty"`
 	Password string `json:"password,omitempty"`
 	Role     string `json:"role,omitempty"`
 	Type     string `json:"type,omitempty"`
@@ -47,10 +48,14 @@ func (d *Database) SetOrReturnDatabase(str string) string {
 }
 
 func (d *Database) Dependencies() []string {
-	deps := []string{"mysql-multi"}
+	deps := []string{"rackspace_iptables"}
+	switch d.Type {
+	case "mysql":
+		deps = append(deps, "mysql-multi")
 
-	if d.Database != "" || d.Database != "" {
-		deps = append(deps, "database")
+		if d.Database != "" || d.Database != "" {
+			deps = append(deps, "database")
+		}
 	}
 
 	return deps
@@ -65,8 +70,8 @@ func (d *Database) GenFiles() error {
 	}
 
 	cookbookFiles := map[string]string{
-		recipeFile: "recipes/database.rb",
-		specFile:   "test/unit/spec/database_spec.rb",
+		recipeFile: fmt.Sprintf("recipes/%s.rb", d.Type),
+		specFile:   fmt.Sprintf("test/unit/spec/%s_spec.rb", d.Type),
 	}
 
 	templateBox, _ := rice.FindBox("../templates/database")
