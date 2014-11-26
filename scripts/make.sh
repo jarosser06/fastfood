@@ -15,4 +15,7 @@ case $1 in
   mkdir -p ${GOPATH}/src/github.com/jarosser06
   go build -o bin/fastfood ./fastfood.go
   ;;
+"install")
+  cp bin/fastfood /usr/local/bin
+  ;;
 esac

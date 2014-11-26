@@ -27,3 +27,7 @@ clean:
 		@echo "Cleaning up..."
 		rm -rf bin
 		rm -rf .gopath
+
+install:
+		@echo "Installing to user's bin..."
+		scripts/make.sh install
