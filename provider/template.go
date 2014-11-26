@@ -1,4 +1,4 @@
-package template
+package provider
 
 import (
 	"bytes"
@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"text/template"
-
-	"github.com/jarosser06/fastfood/util"
 )
 
 const (
@@ -18,10 +17,11 @@ const (
 
 type Template struct {
 	Content string
+	Raw     string
 }
 
 // Given a name, an interface, and the template content returns a Template
-func NewTemplate(name string, values interface{}, content ...string) (*Template, error) {
+func NewTemplate(name string, values interface{}, content []string) (*Template, error) {
 	temp := template.New(name)
 
 	temp.Delims(leftDelim, rightDelim)
@@ -52,7 +52,7 @@ func (t *Template) Flush(fileName string) error {
 	return nil
 }
 
-// Helper calls util.CollapseNewlines on template string
 func (t *Template) CleanNewlines() {
-	t.Content = util.CollapseNewlines(t.Content)
+	reg, _ := regexp.Compile("[\n]{3,}")
+	t.Content = reg.ReplaceAllString(t.Content, "\n\n")
 }

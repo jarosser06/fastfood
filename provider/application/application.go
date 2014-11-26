@@ -7,9 +7,8 @@ import (
 	"path"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/helpers"
+	"github.com/jarosser06/fastfood/provider"
 	"github.com/jarosser06/fastfood/provider/cookbook"
-	"github.com/jarosser06/fastfood/template"
 	"github.com/jarosser06/fastfood/util"
 )
 
@@ -23,7 +22,7 @@ const (
 )
 
 type Application struct {
-	*helpers.Template
+	*provider.Helpers
 	Cookbook  cookbook.Cookbook
 	Name      string `json:"name,omitempty"`
 	Owner     string `json:"owner,omitempty"`
@@ -77,7 +76,11 @@ func (a *Application) GenFiles() error {
 		tmpStr, _ := templateBox.String(templateFile)
 		partialStr, _ := templateBox.String("partials/site_setup.rb")
 
-		t, err := template.NewTemplate(cookbookFile, a, tmpStr, partialStr)
+		t, err := provider.NewTemplate(
+			cookbookFile,
+			a,
+			[]string{tmpStr, partialStr},
+		)
 
 		if err != nil {
 			return errors.New(fmt.Sprintf("Error creating template: %v", err))

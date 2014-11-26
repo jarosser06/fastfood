@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"regexp"
 )
 
 // Utility function for appending to a file
@@ -24,13 +23,6 @@ func AppendFile(file string, text string) error {
 	return nil
 }
 
-// Assume 3 or more newlines should be compressed
-func CollapseNewlines(str string) string {
-	reg, _ := regexp.Compile("[\n]{3,}")
-
-	return reg.ReplaceAllString(str, "\n\n")
-}
-
 func FileExist(filePath string) bool {
 	_, err := os.Stat(filePath)
 
@@ -39,10 +31,4 @@ func FileExist(filePath string) bool {
 	} else {
 		return false
 	}
-}
-
-func IsNodeAttr(str string) bool {
-	reg, _ := regexp.Compile(`^node((\[\'([\w_-]+)\'\])+)`)
-
-	return reg.MatchString(str)
 }

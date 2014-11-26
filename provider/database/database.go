@@ -7,9 +7,8 @@ import (
 	"path"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/helpers"
+	"github.com/jarosser06/fastfood/provider"
 	"github.com/jarosser06/fastfood/provider/cookbook"
-	"github.com/jarosser06/fastfood/template"
 	"github.com/jarosser06/fastfood/util"
 )
 
@@ -19,7 +18,7 @@ const (
 )
 
 type Database struct {
-	*helpers.Template
+	*provider.Helpers
 	Cookbook cookbook.Cookbook
 	Database string `json:"database,omitempty"`
 	Name     string `json:"name,omitempty"`
@@ -74,7 +73,7 @@ func (d *Database) GenFiles() error {
 	for cookbookFile, templateFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(templateFile)
 
-		t, err := template.NewTemplate(cookbookFile, d, tmpStr)
+		t, err := provider.NewTemplate(cookbookFile, d, []string{tmpStr})
 
 		if err != nil {
 			return errors.New(fmt.Sprintf("Error creating template: %v", err))

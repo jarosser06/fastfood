@@ -1,9 +1,9 @@
-package helpers
+package provider
 
 import "testing"
 
 func TestQString(t *testing.T) {
-	s := Template{}
+	s := Helpers{}
 
 	testMatch := "somestring"
 	testNotMatch := "node['cookbook']['attr']"
@@ -14,5 +14,20 @@ func TestQString(t *testing.T) {
 
 	if res := s.QString(testNotMatch); res != testNotMatch {
 		t.Errorf("Expected %s but recieved %s", res)
+	}
+}
+
+func TestIsNodeAttr(t *testing.T) {
+	testMatch := "node['cookbook']['attr']"
+	testNotMatch := "something[diff]"
+
+	h := Helpers{}
+
+	if !h.IsNodeAttr(testMatch) {
+		t.Errorf("Expected %s to return true", testMatch)
+	}
+
+	if h.IsNodeAttr(testNotMatch) {
+		t.Errorf("Expected %s to return false", testNotMatch)
 	}
 }
