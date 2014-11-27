@@ -25,15 +25,34 @@ conn = {
   password: node['mysql']['server_root_password']
 }
 
+|{ if ne .Databag "" }|
+mysql_creds = Chef::EncryptedDataBagItem.load(
+  '|{ .Databag }|',
+  node.chef_environment
+)
+
 mysql_database |{ .QString .Database }| do
   connection conn
   action :create
 end
 
-mysql_database_user |{ .SetOrReturnDatabase .User }| do
+mysql_database_user mysql_creds['username'] do
   connection conn
-  password |{ .SetOrReturnDatabase .Password }|
+  password mysql_creds['password']
   database |{ .QString .Database }|
   action :create
 end
+|{ else }|
+mysql_database |{ .QString .Database }| do
+  connection conn
+  action :create
+end
+
+mysql_database_user |{ .SetorReturnDatabase .User }| do
+  connection conn
+  password |{ .SetOrReturnDatabase .Password}|
+  database |{ .QString .Database }|
+  action :create
+end
+|{ end }|
 |{ end }|

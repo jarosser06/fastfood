@@ -13,13 +13,15 @@ import (
 )
 
 const (
-	defaultType = "mysql"
-	defaultRole = "master"
+	defaultCredsdatabag = "mysql_credentials"
+	defaultType         = "mysql"
+	defaultRole         = "master"
 )
 
 type Database struct {
 	*provider.Helpers
 	Cookbook cookbook.Cookbook
+	Databag  string `json:"databag,omitempty"`
 	Database string `json:"database,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Openfor  string `json:"openfor,omitempty"`

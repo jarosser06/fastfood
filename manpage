@@ -39,6 +39,9 @@ The name of the recipe
 The name of the database to create, only applies if the role
 is master
 \n
+.BR databag\ \-
+The name of the data bag to load the mysql username and password from.
+\n
 .BR openfor\ \-
 Tag used to search nodes and create port openings for.
 \n
