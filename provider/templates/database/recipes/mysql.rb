@@ -51,7 +51,7 @@ end
 mysql_database_user |{ .SetorReturnDatabase .User }| do
   connection conn
   password |{ .SetOrReturnDatabase .Password}|
-  database |{ .QString .Database }|
+  database_name |{ .QString .Database }|
   action :create
 end
 |{ end }|
