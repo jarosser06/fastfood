@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -64,12 +65,14 @@ func MapArgs(args []string) map[string]string {
 	return argMap
 }
 
-func (g *Generator) Help() string {
-	return "TODO: Add help text for gen command"
-}
-
 func (g *Generator) Run(args []string) int {
 	workingDir, _ := os.Getwd()
+	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
+	cmdFlags.Usage = func() { fmt.Println(g.Help()) }
+
+	if err := cmdFlags.Parse(args); err != nil {
+		return 1
+	}
 
 	if cookbook.PathIsCookbook(workingDir) {
 		ckbk, err := cookbook.NewCookbookFromPath(workingDir)
@@ -104,4 +107,29 @@ func (g *Generator) Run(args []string) int {
 
 func (g *Generator) Synopsis() string {
 	return "Generates a new recipe for an existing cookbook"
+}
+
+func (g *Generator) Help() string {
+	helpText := `
+Usage: fastfood gen [provider] [options]
+
+  This will generate a recipe and spec file
+  based on the provider and options you
+  provide that provider.
+
+  Options are passed using using a key:value
+  notation so to set the name you would use
+  the following:
+
+  name:recipe_name
+
+Generators:
+
+  db     - Creates a database recipe based
+           on the type, defaults to MySQL
+
+  app    - Creates an application recipe
+           based on the type, defaults to Generic`
+
+	return helpText
 }

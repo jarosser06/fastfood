@@ -18,6 +18,7 @@ func (b *Builder) Help() string {
 func (b *Builder) Run(args []string) int {
 	var config, cookbookPath string
 	cmdFlags := flag.NewFlagSet("builder", flag.ContinueOnError)
+	cmdFlags.Usage = func() { fmt.Println(b.Help()) }
 	cmdFlags.StringVar(&cookbookPath, "cookbooks-dir", "", "directory to store new cookbook")
 	cmdFlags.StringVar(&config, "config", "", "json config to build from")
 

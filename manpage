@@ -1,0 +1,58 @@
+.\" Manpage for fastfood.
+.TH man 8 "26 November 2014" "0.0.1" "fastfood man page"
+.SH NAME
+fastfood \- a chef helper
+.SH SYNOPSIS
+fastfood [COMMAND] [OPTIONS]
+.SH DESCRIPTION
+fastfood helps generate new cookbooks and recipes for
+existing recipes.
+.SH COMMANDS
+.SS NEW
+.B fastfood new
+[\fB-cookbooks-dir\fR \fICOOKBOOKSDIR\fR]
+[COOKBOOKNAME]
+
+.SS GEN
+.B fastfood gen
+[\fIPROVIDER\fR]
+.IR options ...
+
+.SH NOTES
+\-
+All provider options are passed using a key:value notation.
+\n
+\-
+Node attributes passed should render correctly without being wrapped
+in quotes.
+.SH PROVIDERS
+.SS DB
+.BR fastfood
+.BR gen
+.BR db
+[\fIOPTIONS\fR]
+\n
+.BR name\ \-
+The name of the recipe
+\n
+.BR database\ \-
+The name of the database to create, only applies if the role
+is master
+\n
+.BR openfor\ \-
+Tag used to search nodes and create port openings for.
+\n
+.BR user\ \-
+Username to use with the database setting, if database is not set
+the user is meaningless.
+\n
+.BR password\ \-
+Password used for the user
+\n
+.BR role\ \-
+The database role, can be either a slave or master
+\n
+.BR type\ \-
+The type of data base to render.  Valid options are \fImysql\fR
+and \fIpostgres\fR.  Defaults to mysql
+\n
