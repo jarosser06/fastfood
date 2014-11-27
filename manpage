@@ -36,21 +36,21 @@ in quotes.
 The name of the recipe
 \n
 .BR database\ \-
-The name of the database to create, only applies if the role
-is master
+The name of the database to create. Not used if the role is a slave.
 \n
 .BR databag\ \-
 The name of the data bag to load the mysql username and password from.
+Not used if the role is a slave.
 \n
 .BR openfor\ \-
 Tag used to search nodes and create port openings for.
 \n
 .BR user\ \-
 Username to use with the database setting, if database is not set
-the user is meaningless.
+the user is meaningless. Not used if the role is a slave.
 \n
 .BR password\ \-
-Password used for the user
+Password used for the user. Not used if the role is a slave.
 \n
 .BR role\ \-
 The database role, can be either a slave or master
