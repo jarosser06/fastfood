@@ -5,7 +5,7 @@
 # Copyright |{ .Cookbook.Year }|, Rackspace
 #
 
-include_recipe 'mysql-multi::mysql_|{ .Role }|'
+include_recipe 'mysql-multi::mysql_master'
 
 |{ if ne .Openfor "" }|
 search_string = "chef_environment:#{node.chef_environment} AND tags:|{ .Openfor }|"

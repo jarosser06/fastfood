@@ -72,7 +72,7 @@ func (d *Database) GenFiles() error {
 	}
 
 	cookbookFiles := map[string]string{
-		recipeFile: fmt.Sprintf("recipes/%s.rb", d.Type),
+		recipeFile: fmt.Sprintf("recipes/%s_%s.rb", d.Type, d.Role),
 		specFile:   fmt.Sprintf("test/unit/spec/%s_spec.rb", d.Type),
 	}
 
