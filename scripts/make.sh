@@ -17,5 +17,6 @@ case $1 in
   ;;
 "install")
   cp bin/fastfood /usr/local/bin
+  cp manpage /usr/local/share/man/man1/fastfood.1
   ;;
 esac

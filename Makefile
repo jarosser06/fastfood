@@ -30,4 +30,4 @@ clean:
 
 install:
 		@echo "Installing to user's bin..."
-		scripts/make.sh install
+		@scripts/make.sh install
