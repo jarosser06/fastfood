@@ -79,7 +79,7 @@ func (d *Database) GenFiles() error {
 
 	cookbookFiles := map[string]string{
 		recipeFile: fmt.Sprintf("recipes/%s_%s.rb", d.Type, d.Role),
-		specFile:   fmt.Sprintf("test/unit/spec/%s_spec.rb", d.Type),
+		specFile:   fmt.Sprintf("test/unit/spec/%s_%s_spec.rb", d.Type, d.Role),
 	}
 
 	templateBox, _ := rice.FindBox("../templates/database")
