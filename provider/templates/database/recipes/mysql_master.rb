@@ -49,7 +49,7 @@ mysql_database |{ .QString .Database }| do
   action :create
 end
 
-mysql_database_user |{ .SetorReturnDatabase .User }| do
+mysql_database_user |{ .SetOrReturnDatabase .User }| do
   connection conn
   password |{ .SetOrReturnDatabase .Password}|
   database_name |{ .QString .Database }|

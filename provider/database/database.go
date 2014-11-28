@@ -54,10 +54,16 @@ func (d *Database) Dependencies() []string {
 	switch d.Type {
 	case "mysql":
 		deps = append(deps, "mysql-multi")
+	case "postgres":
+		deps = append(deps, "postgres-multi")
 
-		if d.Database != "" || d.Database != "" {
-			deps = append(deps, "database")
+		if d.Openfor != "" {
+			deps = append(deps, "chef-sugar")
 		}
+	}
+
+	if d.Database != "" {
+		deps = append(deps, "database")
 	}
 
 	return deps

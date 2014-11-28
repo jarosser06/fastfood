@@ -43,7 +43,9 @@ The name of the data bag to load the mysql username and password from.
 Not used if the role is a slave.
 \n
 .BR openfor\ \-
-Tag used to search nodes and create port openings for.
+Tag used to search nodes and create port openings for. For postgres
+this includes adding the appropriate entries in pg_hba if the
+database is set.
 \n
 .BR user\ \-
 Username to use with the database setting, if database is not set
