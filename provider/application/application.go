@@ -16,7 +16,6 @@ const (
 	defaultRevision  = "master"
 	defaultRoot      = "/var/www"
 	defaultType      = "generic"
-	defaultOwner     = "node['apache']['user']"
 	defaultWebserver = "apache"
 	defaultRepo      = "git@github.com/jarosser06/magic"
 )
@@ -25,11 +24,11 @@ type Application struct {
 	*provider.Helpers
 	Cookbook  cookbook.Cookbook
 	Name      string `json:"name,omitempty"`
-	Owner     string `json:"owner,omitempty"`
 	Repo      string `json:"repo,omitempty"`
 	Revision  string `json:"revision,omitempty"`
 	Root      string `json:"docroot,omitempty"`
 	Type      string `json:"type,omitempty"`
+	User      string `json:"user,omitempty"`
 	Webserver string `json:"webserver,omitempty"`
 }
 
@@ -39,12 +38,19 @@ func New(name string, ckbk cookbook.Cookbook) Application {
 	return Application{
 		Cookbook:  ckbk,
 		Name:      name,
-		Owner:     defaultOwner,
 		Repo:      defaultRepo,
 		Revision:  defaultRevision,
 		Root:      defaultRoot,
 		Type:      defaultType,
 		Webserver: defaultWebserver,
+	}
+}
+
+func (a *Application) Owner() string {
+	if len(a.User) == 0 {
+		return fmt.Sprintf("node['%s']['user']", a.Webserver)
+	} else {
+		return a.User
 	}
 }
 
