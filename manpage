@@ -61,3 +61,31 @@ The database role, can be either a slave or master
 The type of data base to render.  Valid options are \fImysql\fR
 and \fIpostgres\fR.  Defaults to mysql
 \n
+.SS Application
+.BR fastfood
+.BR gen
+.BR app
+[\fIOPTIONS\fR]
+\n
+.BR name\ \-
+The name of the recipe
+\n
+.BR repo\ \-
+The name of the repo to deploy from.
+\n
+.BR revision\ \-
+The name of the revision to deploy.
+\n
+.BR root\ \-
+The root directory to deploy the application to.
+\n
+.BR type\ \-
+The type of application to deploy, defaults to a generic application.
+\n
+.BR user\ \-
+The user to deploy and run the application as.
+\n
+.BR webserver\ \-
+The webserver to use with the application.  Valid options are
+nginx and apache, defaults to apache.
+\n
