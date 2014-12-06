@@ -1,0 +1,50 @@
+{
+  "id": "database",
+  "dependencies": [
+    "rackspace_iptables"
+  ],
+  "options": {
+    "database": {
+      "help": "the name of the database to create"
+    },
+    "databag": {
+      "help": "The name of the data bag to load the mysql username and password from.  Not used if the role is a slave"
+    },
+    "user": {
+      "help": "The user to create with permissions to the database"
+    },
+    "password": {
+      "help": "The password to use for the User.  Option not used if role is slave"
+    }
+  },
+  "types": {
+    "mysql_master": {
+      "dependencies": [
+        "database",
+        "mysql-multi"
+      ],
+      "files": [
+        "recipes/mysql_master.rb",
+        "test/unit/spec/mysql_master_spec.rb"
+      ]
+    },
+    "mysql_slave": {
+      "dependencies": [
+        "mysql-multi"
+      ],
+      "files": [
+        "recipes/mysql_slave.rb",
+        "test/unit/spec/mysql_slave_spec.rb"
+      ]
+    },
+    "postgres_master": {
+      "dependencies": [
+        "pg-multi"
+      ],
+      "files": [
+        "recipes/postgres_master.rb",
+        "test/unit/spec/postgres_slave_spec.rb"
+      ]
+    }
+  }
+}

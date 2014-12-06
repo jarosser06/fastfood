@@ -176,6 +176,6 @@ func (c *Cookbook) AppendDependencies(dependencies []string) {
 
 	util.AppendFile(
 		path.Join(c.Path, "metadata.rb"),
-		fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
+		fmt.Sprintf("\n%s", strings.Join(depBuffer, "\n")),
 	)
 }
