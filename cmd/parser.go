@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
+	"github.com/jarosser06/fastfood/provider"
 )
 
 type Command struct {
@@ -50,4 +52,20 @@ func NewCommandFromFile(name string, path string) Command {
 	}
 
 	return c
+}
+
+func ParseProviderFromFile(ckbk provider.Cookbook, path string) provider.Provider {
+	provider := provider.NewProvider(ckbk)
+
+	f, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to read file %s", path))
+	}
+
+	err = json.Unmarshal(f, &provider)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to parse json: %v", err))
+	}
+
+	return provider
 }

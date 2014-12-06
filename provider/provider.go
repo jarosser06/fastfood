@@ -3,6 +3,7 @@ package provider
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 
@@ -10,10 +11,11 @@ import (
 )
 
 type ProviderType struct {
-	dependencies []string          `json:"dependencies"`
-	files        map[string]string `json:"files"`
-	partials     []string          `json:"partials"`
-	directories  []string          `json:"directories"`
+	Deps        []string           `json:"dependencies"`
+	Directories []string           `json:"directories"`
+	Files       map[string]string  `json:"files"`
+	Opts        map[string]Options `json:"options"`
+	Partials    []string           `json:"partials"`
 }
 
 type Options struct {
@@ -22,64 +24,111 @@ type Options struct {
 }
 
 type Provider struct {
-	*Helpers
-	Cookbook     Cookbook
-	defaultType  string                  `json:"default_type"`
-	dependencies []string                `json:"dependencies"`
-	options      map[string]Options      `json:"options"`
-	types        map[string]ProviderType `json:"types"`
+	Cookbook      Cookbook
+	DefaultType   string             `json:"default_type"`
+	Deps          []string           `json:"dependencies"`
+	Opts          map[string]Options `json:"options"`
+	TemplatesPath string
+	Types         map[string]ProviderType `json:"types"`
 }
 
 // Return a new provider, not extremley helpful atm
-func NewProvider(ckbk Cookbook) Provider {
+// Takes a cookbook and path to the provider templates
+func NewProvider(ckbk Cookbook, templatesPath string) Provider {
 	return Provider{
-		Cookbook: ckbk,
+		Cookbook:      ckbk,
+		TemplatesPath: templatesPath,
 	}
 }
 
 // Return true if the type exists in types
 func (p *Provider) ValidType(typeName string) bool {
-	_, ok := p.types[typeName]
+	_, ok := p.Types[typeName]
 	return ok
 }
 
 // Returns a string slice of dependencies
 func (p *Provider) Dependencies(typeName string) []string {
-	deps := p.dependencies
-	deps = append(p.types[typeName].dependencies, deps...)
+	deps := p.Deps
+	deps = append(p.Types[typeName].Deps, deps...)
 
 	return deps
 }
 
-// TODO: Rewrite without Rice
-func (p *Provider) GenFiles(typeName string) error {
+// Merge all of the options from a given map with the defaults from the
+// type and provider
+func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string]string {
+
+	// Merge type options first
+	// Gives the ability to override provider global options
+	for optName, optVal := range p.Types[typeName].Opts {
+		if val := optVal.DefaultValue; val != "" {
+			if _, ok := opts[optName]; !ok {
+				opts[optName] = optVal.DefaultValue
+			}
+		}
+	}
+
+	for optName, optVal := range p.Opts {
+		if val := optVal.DefaultValue; val != "" {
+			if _, ok := opts[optName]; !ok {
+				opts[optName] = optVal.DefaultValue
+			}
+		}
+	}
+
+	return opts
+}
+
+// Creates the expected struct for all templates and renders each template one by one
+func (p *Provider) GenFiles(typeName string, opts map[string]string) error {
+	templateOpts := struct {
+		*Helpers
+		Cookbook Cookbook
+		Options  map[string]string
+	}{
+		Cookbook: p.Cookbook,
+		Options:  p.MergeOpts(typeName, opts),
+	}
+
 	/*
 		if util.FileExist(path.Join(p.Cookbook.Path, recipeFile)) {
 			return errors.New(fmt.Sprintf("%s already exists", recipeFile))
 		}
-
-		cookbookFiles := map[string]string{
-			recipeFile: fmt.Sprintf("recipes/%s_%s.rb", d.Type, d.Role),
-			specFile:   fmt.Sprintf("test/unit/spec/%s_%s_spec.rb", d.Type, d.Role),
-		}
-
-		templateBox, _ := rice.FindBox("../templates/database")
-		for cookbookFile, templateFile := range cookbookFiles {
-			tmpStr, _ := templateBox.String(templateFile)
-
-			t, err := provider.NewTemplate(cookbookFile, d, []string{tmpStr})
-
-			if err != nil {
-				return errors.New(fmt.Sprintf("Error creating template: %v", err))
-			}
-
-			t.CleanNewlines()
-
-			if err := t.Flush(path.Join(d.Cookbook.Path, cookbookFile)); err != nil {
-				return errors.New(fmt.Sprintf("Error writing file: %v", err))
-			}
-		}
 	*/
+
+	// TODO: Some of this could be cleaned up and added to the provider.Template
+	files := p.Types[typeName].Files
+	partials := p.Types[typeName].Partials
+	for cookbookFile, templateFile := range files {
+		var content []string
+		b, err := ioutil.ReadFile(path.Join(p.TemplatesPath, templateFile))
+		if err != nil {
+			return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
+		}
+
+		content = append(content, string(b))
+		for _, partial := range partials {
+			b, err := ioutil.ReadFile(path.Join(p.TemplatesPath, partial))
+			if err != nil {
+				return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
+			}
+
+			content = append(content, string(b))
+		}
+
+		t, err := NewTemplate(cookbookFile, templateOpts, content)
+
+		if err != nil {
+			return errors.New(fmt.Sprintf("Error creating template: %v", err))
+		}
+
+		t.CleanNewlines()
+
+		if err := t.Flush(path.Join(p.Cookbook.Path, cookbookFile)); err != nil {
+			return errors.New(fmt.Sprintf("Error writing file: %v", err))
+		}
+	}
 	return nil
 }
 
@@ -88,7 +137,7 @@ func (p *Provider) GenFiles(typeName string) error {
 // since they are the most common
 func (p *Provider) GenDirs(typeName string) error {
 	dirs := append(
-		p.types[typeName].directories,
+		p.Types[typeName].Directories,
 		"recipes",
 		"test/unit/spec",
 	)

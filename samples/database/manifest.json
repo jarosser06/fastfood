@@ -1,5 +1,6 @@
 {
   "id": "database",
+  "default_type": "mysql_master",
   "dependencies": [
     "rackspace_iptables"
   ],
@@ -39,7 +40,8 @@
     },
     "postgres_master": {
       "dependencies": [
-        "pg-multi"
+        "pg-multi",
+        "database"
       ],
       "files": {
         "recipes/%s.rb": "recipes/postgres_master.rb",
