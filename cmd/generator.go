@@ -4,48 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
-	"github.com/jarosser06/fastfood/provider/application"
 	"github.com/jarosser06/fastfood/provider/cookbook"
-	"github.com/jarosser06/fastfood/provider/database"
-	"github.com/mitchellh/mapstructure"
+	"github.com/jarosser06/fastfood/util"
 )
 
 type Generator struct {
-	MappedArgs map[string]string
-}
-
-func GenApp(ckbk cookbook.Cookbook, args map[string]string) {
-	app := application.New("app", ckbk)
-
-	mapstructure.Decode(args, &app)
-
-	if err := app.GenDirs(); err != nil {
-		fmt.Printf("Error creating dirs: %v\n", err)
-	}
-
-	if err := app.GenFiles(); err != nil {
-		fmt.Printf("Error creating application: %v\n", err)
-	}
-
-	app.Cookbook.AppendDependencies(app.Dependencies())
-}
-
-func GenDB(ckbk cookbook.Cookbook, args map[string]string) {
-	db := database.New("db", ckbk)
-
-	mapstructure.Decode(args, &db)
-
-	if err := db.GenDirs(); err != nil {
-		fmt.Printf("Error creating dirs: %v\n", err)
-	}
-
-	if err := db.GenFiles(); err != nil {
-		fmt.Printf("Error creating database: %v\n", err)
-	}
-
-	db.Cookbook.AppendDependencies(db.Dependencies())
+	MappedArgs    map[string]string
+	TemplatesPath string
 }
 
 // Translates key:value strings into a map
@@ -69,34 +37,46 @@ func (g *Generator) Run(args []string) int {
 	workingDir, _ := os.Getwd()
 	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(g.Help()) }
+	//templatesPath := cmdFlags.String("templates-path", "samples", "path to the templates directory")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		return 1
 	}
 
 	if cookbook.PathIsCookbook(workingDir) {
-		ckbk, err := cookbook.NewCookbookFromPath(workingDir)
+		/*
+			ckbk, err := cookbook.NewCookbookFromPath(workingDir)
 
-		if err != nil {
-			fmt.Println("Unable to parse cookbook")
+			if err != nil {
+				fmt.Println("Unable to parse cookbook")
+				return 1
+			}
+		*/
+
+		cmdManifest := path.Join("/home/jim/Projects/fastfood/samples", "manifest.json")
+		if !util.FileExist(cmdManifest) {
+			fmt.Printf("Error no such file %s\n", cmdManifest)
 			return 1
-		}
-
-		// Map the specific gen function to the passed arg
-		mappedArgs := MapArgs(args)
-		genCommands := map[string]interface{}{
-			"app": GenApp,
-			"db":  GenDB,
 		}
 
 		// Remove the first arg as the command
 		genCommand, args := args[0], args[1:len(args)]
-		// Attempt to call the command function if it exists
-		if com, ok := genCommands[genCommand]; ok {
-			com.(func(cookbook.Cookbook, map[string]string))(ckbk, mappedArgs)
-		} else {
-			fmt.Printf("No generator for %s\n", args[0])
+
+		commands := ParseCommandsFromFile(cmdManifest)
+		for _, command := range commands {
+			if command.Name == genCommand {
+				goto CMDFound
+			}
 		}
+
+		// If the loop finishes without finding the commnad exit
+		fmt.Printf("No generator found for %s\n", genCommand)
+		return 1
+
+		// Command was found continue to execute
+	CMDFound:
+
+		fmt.Println(MapArgs(args))
 
 	} else {
 		fmt.Println("You must run this command from a cookbook directory")
@@ -109,6 +89,7 @@ func (g *Generator) Synopsis() string {
 	return "Generates a new recipe for an existing cookbook"
 }
 
+// Autogenerate based on commands parsed
 func (g *Generator) Help() string {
 	helpText := `
 Usage: fastfood gen [provider] [options]

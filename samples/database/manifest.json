@@ -23,28 +23,28 @@
         "database",
         "mysql-multi"
       ],
-      "files": [
-        "recipes/mysql_master.rb",
-        "test/unit/spec/mysql_master_spec.rb"
-      ]
+      "files": {
+        "recipes/%s.rb": "recipes/mysql_master.rb",
+        "test/unit/spec/%s_spec.rb": "test/unit/spec/mysql_master_spec.rb"
+      }
     },
     "mysql_slave": {
       "dependencies": [
         "mysql-multi"
       ],
-      "files": [
-        "recipes/mysql_slave.rb",
-        "test/unit/spec/mysql_slave_spec.rb"
-      ]
+      "files": {
+        "recipes/%s.rb": "recipes/mysql_slave.rb",
+        "test/unit/spec/%s_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
+      }
     },
     "postgres_master": {
       "dependencies": [
         "pg-multi"
       ],
-      "files": [
-        "recipes/postgres_master.rb",
-        "test/unit/spec/postgres_slave_spec.rb"
-      ]
+      "files": {
+        "recipes/%s.rb": "recipes/postgres_master.rb",
+        "test/unit/spec/postgres_slave_spec.rb": "test/unit/spec/postgres_slave_spec.rb"
+      }
     }
   }
 }
