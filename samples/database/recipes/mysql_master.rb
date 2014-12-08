@@ -1,14 +1,15 @@
 #
 # Cookbook Name:: |{ .Cookbook.Name }|
-# Recipe :: |{ .Name }|
+# Recipe :: |{ .Options.name }|
 #
 # Copyright |{ .Cookbook.Year }|, Rackspace
 #
 
+|{ .Options }|
 include_recipe 'mysql-multi::mysql_master'
 
-|{ if ne .Openfor "" }|
-search_string = "chef_environment:#{node.chef_environment} AND tags:|{ .Openfor }|"
+|{ if ne .Options.openfor "" }|
+search_string = "chef_environment:#{node.chef_environment} AND tags:|{ .Options.openfor }|"
 search_add_iptables_rules(
   search_string,
   'INPUT',
@@ -18,7 +19,7 @@ search_add_iptables_rules(
 )
 |{ end }|
 
-|{ if ne .Database "" }|
+|{ if ne .Options.database "" }|
 conn = {
   host:  'localhost',
   username: 'root',
@@ -26,13 +27,13 @@ conn = {
 }
 
 include_recipe 'database::mysql'
-|{ if ne .Databag "" }|
+|{ if ne .Options.databag "" }|
 mysql_creds = Chef::EncryptedDataBagItem.load(
-  '|{ .Databag }|',
+  '|{ .Options.Databag }|',
   node.chef_environment
 )
 
-mysql_database |{ .QString .Database }| do
+mysql_database |{ .QString .Options.database }| do
   connection conn
   action :create
 end
@@ -40,19 +41,19 @@ end
 mysql_database_user mysql_creds['username'] do
   connection conn
   password mysql_creds['password']
-  database |{ .QString .Database }|
+  database |{ .QString .Options.database }|
   action :create
 end
 |{ else }|
-mysql_database |{ .QString .Database }| do
+  mysql_database |{ .QString .Options.database }| do
   connection conn
   action :create
 end
 
-mysql_database_user |{ .SetOrReturnDatabase .User }| do
+mysql_database_user |{ .Options.user }| do
   connection conn
-  password |{ .SetOrReturnDatabase .Password}|
-  database_name |{ .QString .Database }|
+  password |{ .Options.password}|
+  database_name |{ .QString .Options.database }|
   action :create
 end
 |{ end }|

@@ -7,9 +7,11 @@ import (
 	"path"
 	"strings"
 
-	"github.com/jarosser06/fastfood/provider/cookbook"
+	"github.com/jarosser06/fastfood/provider"
 	"github.com/jarosser06/fastfood/util"
 )
+
+const templatePack = "/home/jim/Projects/fastfood/samples"
 
 type Generator struct {
 	MappedArgs    map[string]string
@@ -43,17 +45,15 @@ func (g *Generator) Run(args []string) int {
 		return 1
 	}
 
-	if cookbook.PathIsCookbook(workingDir) {
-		/*
-			ckbk, err := cookbook.NewCookbookFromPath(workingDir)
+	if provider.PathIsCookbook(workingDir) {
+		ckbk, err := provider.NewCookbookFromPath(workingDir)
 
-			if err != nil {
-				fmt.Println("Unable to parse cookbook")
-				return 1
-			}
-		*/
+		if err != nil {
+			fmt.Println("Unable to parse cookbook")
+			return 1
+		}
 
-		cmdManifest := path.Join("/home/jim/Projects/fastfood/samples", "manifest.json")
+		cmdManifest := path.Join(templatePack, "manifest.json")
 		if !util.FileExist(cmdManifest) {
 			fmt.Printf("Error no such file %s\n", cmdManifest)
 			return 1
@@ -63,10 +63,8 @@ func (g *Generator) Run(args []string) int {
 		genCommand, args := args[0], args[1:len(args)]
 
 		commands := ParseCommandsFromFile(cmdManifest)
-		for _, command := range commands {
-			if command.Name == genCommand {
-				goto CMDFound
-			}
+		if _, ok := commands[genCommand]; ok {
+			goto CMDFound
 		}
 
 		// If the loop finishes without finding the commnad exit
@@ -76,7 +74,35 @@ func (g *Generator) Run(args []string) int {
 		// Command was found continue to execute
 	CMDFound:
 
-		fmt.Println(MapArgs(args))
+		p := ParseProviderFromFile(
+			ckbk,
+			path.Join(templatePack, commands[genCommand].Manifest),
+		)
+
+		mappedArgs := MapArgs(args)
+		var providerType string
+		if val, ok := mappedArgs["type"]; ok {
+			providerType = val
+		} else {
+			if p.DefaultType != "" {
+				providerType = p.DefaultType
+			} else {
+				fmt.Println("You must pass a type b/c not default type is set")
+				return 1
+			}
+		}
+
+		p.GenDirs(providerType)
+		err = p.GenFiles(
+			providerType,
+			path.Join(templatePack, genCommand),
+			mappedArgs,
+		)
+
+		if err != nil {
+			fmt.Printf("Error generating files %v\n", err)
+			return 1
+		}
 
 	} else {
 		fmt.Println("You must run this command from a cookbook directory")

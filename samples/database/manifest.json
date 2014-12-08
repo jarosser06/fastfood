@@ -16,6 +16,9 @@
     },
     "password": {
       "help": "The password to use for the User.  Option not used if role is slave"
+    },
+    "openfor": {
+      "help": "A tag used to locate what nodes to open the firewall for"
     }
   },
   "types": {
@@ -25,8 +28,13 @@
         "mysql-multi"
       ],
       "files": {
-        "recipes/%s.rb": "recipes/mysql_master.rb",
-        "test/unit/spec/%s_spec.rb": "test/unit/spec/mysql_master_spec.rb"
+        "recipes/<NAME>.rb": "recipes/mysql_master.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
+      },
+      "options": {
+        "name": {
+          "default": "mysql_master"
+        }
       }
     },
     "mysql_slave": {
@@ -34,8 +42,13 @@
         "mysql-multi"
       ],
       "files": {
-        "recipes/%s.rb": "recipes/mysql_slave.rb",
-        "test/unit/spec/%s_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
+        "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
+      },
+      "options": {
+        "name": {
+          "default": "mysql_slave"
+        }
       }
     },
     "postgres_master": {
@@ -44,8 +57,13 @@
         "database"
       ],
       "files": {
-        "recipes/%s.rb": "recipes/postgres_master.rb",
-        "test/unit/spec/postgres_slave_spec.rb": "test/unit/spec/postgres_slave_spec.rb"
+        "recipes/<NAME>.rb": "recipes/postgres_master.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/postgres_slave_spec.rb"
+      },
+      "options": {
+        "name": {
+          "default": "postgres_master"
+        }
       }
     }
   }

@@ -9,7 +9,7 @@ import (
 )
 
 type Command struct {
-	Name          string
+	Name          string `json:"name"`
 	Manifest      string `json:"manifest"`
 	Help          string `json:"help"`
 	templatesPath string
@@ -19,10 +19,10 @@ func NewCommand(name string) Command {
 	return Command{Name: name}
 }
 
-func ParseCommandsFromFile(path string) []Command {
+func ParseCommandsFromFile(path string) map[string]Command {
 
 	cmdsStruct := struct {
-		Commands []Command
+		Commands map[string]Command
 	}{}
 
 	f, err := ioutil.ReadFile(path)
@@ -54,6 +54,7 @@ func NewCommandFromFile(name string, path string) Command {
 	return c
 }
 
+//TODO: This really shouldn't belong to the cmd parser
 func ParseProviderFromFile(ckbk provider.Cookbook, path string) provider.Provider {
 	provider := provider.NewProvider(ckbk)
 

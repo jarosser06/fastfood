@@ -1,8 +1,8 @@
 require_relative 'spec_helper'
 
-describe '|{ .Cookbook.Name }|::|{ .Name }|' do
+describe '|{ .Cookbook.Name }|::|{ .Options.name }|' do
   let(:chef_run) do
-    ChefSpec::Runner.new.converge('|{ .Cookbook.Name }|::|{ .Name }|')
+    ChefSpec::Runner.new.converge('|{ .Cookbook.Name }|::|{ .Options.name }|')
   end
 
   it 'includes the mysql-multi::mysql_slave recipe' do

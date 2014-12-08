@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/jarosser06/fastfood/util"
 )
@@ -24,20 +25,18 @@ type Options struct {
 }
 
 type Provider struct {
-	Cookbook      Cookbook
-	DefaultType   string             `json:"default_type"`
-	Deps          []string           `json:"dependencies"`
-	Opts          map[string]Options `json:"options"`
-	TemplatesPath string
-	Types         map[string]ProviderType `json:"types"`
+	Cookbook    Cookbook
+	DefaultType string                  `json:"default_type"`
+	Deps        []string                `json:"dependencies"`
+	Opts        map[string]Options      `json:"options"`
+	Types       map[string]ProviderType `json:"types"`
 }
 
 // Return a new provider, not extremley helpful atm
 // Takes a cookbook and path to the provider templates
-func NewProvider(ckbk Cookbook, templatesPath string) Provider {
+func NewProvider(ckbk Cookbook) Provider {
 	return Provider{
-		Cookbook:      ckbk,
-		TemplatesPath: templatesPath,
+		Cookbook: ckbk,
 	}
 }
 
@@ -62,17 +61,21 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 	// Merge type options first
 	// Gives the ability to override provider global options
 	for optName, optVal := range p.Types[typeName].Opts {
-		if val := optVal.DefaultValue; val != "" {
-			if _, ok := opts[optName]; !ok {
+		if _, ok := opts[optName]; !ok {
+			if val := optVal.DefaultValue; val != "" {
 				opts[optName] = optVal.DefaultValue
+			} else {
+				opts[optName] = ""
 			}
 		}
 	}
 
 	for optName, optVal := range p.Opts {
-		if val := optVal.DefaultValue; val != "" {
-			if _, ok := opts[optName]; !ok {
+		if _, ok := opts[optName]; !ok {
+			if val := optVal.DefaultValue; val != "" {
 				opts[optName] = optVal.DefaultValue
+			} else {
+				opts[optName] = ""
 			}
 		}
 	}
@@ -81,7 +84,7 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 }
 
 // Creates the expected struct for all templates and renders each template one by one
-func (p *Provider) GenFiles(typeName string, opts map[string]string) error {
+func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[string]string) error {
 	templateOpts := struct {
 		*Helpers
 		Cookbook Cookbook
@@ -91,25 +94,25 @@ func (p *Provider) GenFiles(typeName string, opts map[string]string) error {
 		Options:  p.MergeOpts(typeName, opts),
 	}
 
-	/*
-		if util.FileExist(path.Join(p.Cookbook.Path, recipeFile)) {
-			return errors.New(fmt.Sprintf("%s already exists", recipeFile))
-		}
-	*/
+	fmt.Printf("%v\n", templateOpts.Options)
 
 	// TODO: Some of this could be cleaned up and added to the provider.Template
 	files := p.Types[typeName].Files
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
+		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["name"], 1)
+		if util.FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
+			continue
+		}
 		var content []string
-		b, err := ioutil.ReadFile(path.Join(p.TemplatesPath, templateFile))
+		b, err := ioutil.ReadFile(path.Join(templatesPath, templateFile))
 		if err != nil {
 			return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
 		}
 
 		content = append(content, string(b))
 		for _, partial := range partials {
-			b, err := ioutil.ReadFile(path.Join(p.TemplatesPath, partial))
+			b, err := ioutil.ReadFile(path.Join(templatesPath, partial))
 			if err != nil {
 				return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
 			}
