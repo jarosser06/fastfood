@@ -10,7 +10,9 @@ import (
 	"github.com/jarosser06/fastfood"
 )
 
-const templatePack = "/home/jim/Projects/fastfood/samples"
+const (
+	tempPackEnvVar = "FASTFOOD_TEMPLATE_PACK"
+)
 
 type Generator struct {
 	MappedArgs    map[string]string
@@ -34,11 +36,21 @@ func MapArgs(args []string) map[string]string {
 	return argMap
 }
 
+func DefTempPack() string {
+	packEnv := os.Getenv("FASTFOOD_TEMPLATE_PACK")
+	if packEnv == "" {
+		return path.Join(os.Getenv("HOME"), "fastfood")
+	} else {
+		return packEnv
+	}
+}
+
 func (g *Generator) Run(args []string) int {
 	workingDir, _ := os.Getwd()
 	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(g.Help()) }
-	//templatesPath := cmdFlags.String("templates-path", "samples", "path to the templates directory")
+
+	templatePack := *cmdFlags.String("templates-pack", DefTempPack(), "path to the templates directory")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		return 1
@@ -73,7 +85,7 @@ func (g *Generator) Run(args []string) int {
 		// Command was found continue to execute
 	CMDFound:
 
-		p := ParseProviderFromFile(
+		p := fastfood.NewProviderFromFile(
 			ckbk,
 			path.Join(templatePack, commands[genCommand].Manifest),
 		)

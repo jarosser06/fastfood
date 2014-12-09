@@ -1,6 +1,7 @@
 package fastfood
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -36,6 +37,24 @@ func NewProvider(ckbk Cookbook) Provider {
 	return Provider{
 		Cookbook: ckbk,
 	}
+}
+
+//TODO: Return proper errors instead fo panicing
+func NewProviderFromFile(ckbk Cookbook, file string) Provider {
+	provider := NewProvider(ckbk)
+
+	f, err := ioutil.ReadFile(file)
+	// Probably shouldn't Panic, might scare people
+	if err != nil {
+		panic(fmt.Sprintf("Failed to read file %s"))
+	}
+
+	err = json.Unmarshal(f, &provider)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to read file %s"))
+	}
+
+	return provider
 }
 
 // Return true if the type exists in types
