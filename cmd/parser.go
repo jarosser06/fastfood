@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/jarosser06/fastfood/provider"
+	"github.com/jarosser06/fastfood"
 )
 
 type Command struct {
@@ -55,8 +55,8 @@ func NewCommandFromFile(name string, path string) Command {
 }
 
 //TODO: This really shouldn't belong to the cmd parser
-func ParseProviderFromFile(ckbk provider.Cookbook, path string) provider.Provider {
-	provider := provider.NewProvider(ckbk)
+func ParseProviderFromFile(ckbk fastfood.Cookbook, path string) fastfood.Provider {
+	provider := fastfood.NewProvider(ckbk)
 
 	f, err := ioutil.ReadFile(path)
 	if err != nil {

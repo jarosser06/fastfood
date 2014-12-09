@@ -7,8 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/jarosser06/fastfood/provider"
-	"github.com/jarosser06/fastfood/util"
+	"github.com/jarosser06/fastfood"
 )
 
 const templatePack = "/home/jim/Projects/fastfood/samples"
@@ -45,8 +44,8 @@ func (g *Generator) Run(args []string) int {
 		return 1
 	}
 
-	if provider.PathIsCookbook(workingDir) {
-		ckbk, err := provider.NewCookbookFromPath(workingDir)
+	if fastfood.PathIsCookbook(workingDir) {
+		ckbk, err := fastfood.NewCookbookFromPath(workingDir)
 
 		if err != nil {
 			fmt.Println("Unable to parse cookbook")
@@ -54,7 +53,7 @@ func (g *Generator) Run(args []string) int {
 		}
 
 		cmdManifest := path.Join(templatePack, "manifest.json")
-		if !util.FileExist(cmdManifest) {
+		if !fastfood.FileExist(cmdManifest) {
 			fmt.Printf("Error no such file %s\n", cmdManifest)
 			return 1
 		}

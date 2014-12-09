@@ -1,4 +1,4 @@
-package config
+package fastfood
 
 import (
 	"encoding/json"

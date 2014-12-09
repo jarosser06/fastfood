@@ -1,4 +1,4 @@
-package cookbook
+package fastfood
 
 import (
 	"bufio"
@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/jarosser06/fastfood/provider"
-	"github.com/jarosser06/fastfood/util"
 )
 
 type OSTarget struct {
@@ -20,7 +18,7 @@ type OSTarget struct {
 }
 
 type Cookbook struct {
-	*provider.Helpers
+	*Helpers
 	Berks        []string
 	Dependencies []string
 	Name         string
@@ -116,7 +114,7 @@ func (c *Cookbook) GenFiles() error {
 	for _, cookbookFile := range cookbookFiles {
 		tmpStr, _ := templateBox.String(cookbookFile)
 
-		t, err := provider.NewTemplate(cookbookFile, c, []string{tmpStr})
+		t, err := NewTemplate(cookbookFile, c, []string{tmpStr})
 		if err != nil {
 			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
 		}
@@ -174,7 +172,7 @@ func (c *Cookbook) AppendDependencies(dependencies []string) {
 		}
 	}
 
-	util.AppendFile(
+	AppendFile(
 		path.Join(c.Path, "metadata.rb"),
 		fmt.Sprintf("\n%s", strings.Join(depBuffer, "\n")),
 	)

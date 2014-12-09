@@ -1,4 +1,4 @@
-package provider
+package fastfood
 
 import (
 	"errors"
@@ -7,8 +7,6 @@ import (
 	"os"
 	"path"
 	"strings"
-
-	"github.com/jarosser06/fastfood/util"
 )
 
 type ProviderType struct {
@@ -101,7 +99,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[stri
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["name"], 1)
-		if util.FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
+		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
 			continue
 		}
 		var content []string
@@ -148,7 +146,7 @@ func (p *Provider) GenDirs(typeName string) error {
 	for _, dir := range dirs {
 		fullPath := path.Join(p.Cookbook.Path, dir)
 
-		if !util.FileExist(fullPath) {
+		if !FileExist(fullPath) {
 			err := os.MkdirAll(path.Join(p.Cookbook.Path, dir), 0755)
 
 			if err != nil {

@@ -1,4 +1,4 @@
-package provider
+package fastfood
 
 import (
 	"bytes"

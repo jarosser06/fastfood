@@ -3,7 +3,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/jarosser06/fastfood/provider"
+	"github.com/jarosser06/fastfood"
 )
 
 func TestNewCommand(t *testing.T) {
@@ -23,7 +23,7 @@ func TestParseCommandsFromFile(t *testing.T) {
 
 	dbCmdExists := false
 	for _, command := range commands {
-		if command.Name == "db" {
+		if command.Name == "database" {
 			dbCmdExists = true
 		}
 	}
@@ -34,7 +34,7 @@ func TestParseCommandsFromFile(t *testing.T) {
 }
 
 func TestParseProviderFromFile(t *testing.T) {
-	ckbk := provider.Cookbook{
+	ckbk := fastfood.Cookbook{
 		Path:         "/tmp/testcookbook",
 		Name:         "testcookbook",
 		Dependencies: []string{"apt"},
