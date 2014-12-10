@@ -123,7 +123,6 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[stri
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		fmt.Println(cookbookFile)
 		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
 			continue
 		}
