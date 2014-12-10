@@ -108,7 +108,10 @@ func (g *Generator) Run(args []string) int {
 			}
 		}
 
+		// Add the needed dependencies to the metadata
+		ckbk.AppendDependencies(p.Dependencies(providerType))
 		p.GenDirs(providerType)
+
 		err = p.GenFiles(
 			providerType,
 			path.Join(templatePack, genCommand),
