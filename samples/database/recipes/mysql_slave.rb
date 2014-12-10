@@ -1,14 +1,14 @@
 #
 # Cookbook Name:: |{ .Cookbook.Name }|
-# Recipe :: |{ .Name }|
+# Recipe :: |{ .Options.Name }|
 #
 # Copyright |{ .Cookbook.Year }|, Rackspace
 #
 
 include_recipe 'mysql-multi::mysql_slave'
 
-|{ if ne .Openfor "" }|
-search_string = "chef_environment:#{node.chef_environment} AND tags:|{ .Openfor }|"
+|{ if ne .Options.Openfor "" }|
+search_string = "chef_environment:#{node.chef_environment} AND tags:|{ .Options.Openfor }|"
 search_add_iptables_rules(
   search_string,
   'INPUT',

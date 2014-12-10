@@ -1,0 +1,68 @@
+{
+  "id": "application",
+  "default_type": "generic_nginx_app",
+  "dependencies": [
+    "rackspace_iptables",
+    "application"
+  ],
+  "options": {
+    "name": {
+      "help": "Name of the recipe to create",
+      "default": "application"
+    },
+    "repo": {
+      "help": "the repository to deploy from",
+      "default": "## Replace with the customer repository"
+    },
+    "revision": {
+      "help": "the revision to checkout from git",
+      "default": "node.chef_environment"
+    },
+    "owner": {
+      "help": "The application owner"
+    },
+    "root": {
+      "help": "The document root to deploy the application to",
+      "default": "/var/www"
+    },
+    "webserver": {
+      "default": "nginx"
+    }
+  },
+  "types": {
+    "generic_nginx_app": {
+      "dependencies": [
+        "nginx"
+      ],
+      "files": {
+        "recipes/<NAME>.rb": "recipes/application.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/application_spec.rb"
+      },
+      "options": {
+        "owner": {
+          "default": "node['nginx']['user']"
+        },
+        "name": {
+          "default": "nginx_app"
+        }
+      },
+      "partials": [
+        "partials/site_setup.rb"
+      ]
+    },
+    "generic_apache_app": {
+      "dependencies": [
+        "apache2"
+      ],
+      "files": {
+        "recipes/<NAME>.rb": "recipes/application.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/application_spec.rb"
+      },
+      "options": {
+        "name": {
+          "default": "apache_app"
+        }
+      }
+    }
+  }
+}

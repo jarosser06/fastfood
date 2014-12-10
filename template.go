@@ -36,7 +36,10 @@ func NewTemplate(name string, values interface{}, content []string) (*Template, 
 
 	//TODO: Print errors during template parsing
 	var buffer bytes.Buffer
-	temp.Execute(&buffer, values)
+	err := temp.Execute(&buffer, values)
+	if err != nil {
+		return &Template{}, err
+	}
 	return &Template{Content: buffer.String()}, nil
 }
 

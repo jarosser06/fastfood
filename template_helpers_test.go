@@ -31,3 +31,18 @@ func TestIsNodeAttr(t *testing.T) {
 		t.Errorf("Expected %s to return false", testNotMatch)
 	}
 }
+
+func TestIsChefVar(t *testing.T) {
+	testMatch := "node.chef_environment"
+	testNotMatch := "nodesomething"
+
+	h := Helpers{}
+
+	if !h.IsChefVar(testMatch) {
+		t.Errorf("Expected %s to return true", testMatch)
+	}
+
+	if h.IsChefVar(testNotMatch) {
+		t.Errorf("Expected %s to return false", testNotMatch)
+	}
+}

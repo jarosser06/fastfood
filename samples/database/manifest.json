@@ -58,7 +58,7 @@
       ],
       "files": {
         "recipes/<NAME>.rb": "recipes/postgres_master.rb",
-        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/postgres_slave_spec.rb"
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/postgres_master_spec.rb"
       },
       "options": {
         "name": {

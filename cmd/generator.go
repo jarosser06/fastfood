@@ -85,10 +85,15 @@ func (g *Generator) Run(args []string) int {
 		// Command was found continue to execute
 	CMDFound:
 
-		p := fastfood.NewProviderFromFile(
+		p, err := fastfood.NewProviderFromFile(
 			ckbk,
 			path.Join(templatePack, commands[genCommand].Manifest),
 		)
+
+		if err != nil {
+			fmt.Println("Error loading provider %s: %v", genCommand, err)
+			return 1
+		}
 
 		mappedArgs := MapArgs(args)
 		var providerType string

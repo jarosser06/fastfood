@@ -1,11 +1,11 @@
 require_relative 'spec_helper'
 
-describe '|{ .Cookbook.Name }|::|{ .Name }|' do
+describe '|{ .Cookbook.Name }|::|{ .Options.Name }|' do
   let(:chef_run) do
-    ChefSpec::Runner.new.converge('|{ .Cookbook.Name }|::|{ .Name }|')
+    ChefSpec::Runner.new.converge('|{ .Cookbook.Name }|::|{ .Options.Name }|')
   end
 
-|{ if eq .Webserver "apache" }|
+|{ if eq .Options.Webserver "apache" }|
   it 'includes the apache recipe' do
     expect(chef_run).include_recipe('apache')
   end

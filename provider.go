@@ -40,21 +40,21 @@ func NewProvider(ckbk Cookbook) Provider {
 }
 
 //TODO: Return proper errors instead fo panicing
-func NewProviderFromFile(ckbk Cookbook, file string) Provider {
+func NewProviderFromFile(ckbk Cookbook, file string) (Provider, error) {
 	provider := NewProvider(ckbk)
 
 	f, err := ioutil.ReadFile(file)
 	// Probably shouldn't Panic, might scare people
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read file %s"))
+		return provider, errors.New(fmt.Sprintf("Failed to read file %s: %v", file, err))
 	}
 
 	err = json.Unmarshal(f, &provider)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read file %s"))
+		return provider, errors.New(fmt.Sprintf("Failed to unmarshal provider json: %v", err))
 	}
 
-	return provider
+	return provider, nil
 }
 
 // Return true if the type exists in types
@@ -102,22 +102,28 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 
 // Creates the expected struct for all templates and renders each template one by one
 func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[string]string) error {
+
+	mergedOpts := p.MergeOpts(typeName, opts)
+	cappedMap := make(map[string]string)
+	for key, val := range mergedOpts {
+		cappedMap[CapitalizeString(key)] = val
+	}
+
 	templateOpts := struct {
 		*Helpers
 		Cookbook Cookbook
 		Options  map[string]string
 	}{
 		Cookbook: p.Cookbook,
-		Options:  p.MergeOpts(typeName, opts),
+		Options:  cappedMap,
 	}
-
-	fmt.Printf("%v\n", templateOpts.Options)
 
 	// TODO: Some of this could be cleaned up and added to the provider.Template
 	files := p.Types[typeName].Files
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
-		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["name"], 1)
+		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
+		fmt.Println(cookbookFile)
 		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
 			continue
 		}
