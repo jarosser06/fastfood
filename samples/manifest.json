@@ -1,0 +1,14 @@
+{
+  "commands": {
+    "database": {
+      "name": "database",
+      "manifest": "database/manifest.json",
+      "help": "Creates a database recipe based on the type, defaults to MySQL"
+    },
+    "application": {
+      "name": "application",
+      "manifest": "application/manifest.json",
+      "help": "Creates an application recipe based on the type, defaults to Generic"
+    }
+  }
+}

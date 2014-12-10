@@ -13,10 +13,10 @@ case $1 in
   ;;
 "build")
   mkdir -p ${GOPATH}/src/github.com/jarosser06
-  go build -o bin/fastfood ./fastfood.go
+  go build -o bin/fastfood ./cmd/main/main.go
   ;;
 "install")
   cp bin/fastfood /usr/local/bin
-  cp manpage /usr/local/share/man/man1/fastfood.1
+  cp doc/manpage /usr/local/share/man/man1/fastfood.1
   ;;
 esac

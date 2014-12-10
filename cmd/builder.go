@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/jarosser06/fastfood/provider/cookbook"
+	"github.com/jarosser06/fastfood"
 )
 
 type Builder struct {
@@ -32,7 +32,7 @@ func (b *Builder) Run(args []string) int {
 		fmt.Println("Placeholder for generating from a config")
 	} else {
 		if len(args) > 0 {
-			cookbook := cookbook.NewCookbook(cookbookPath, args[0])
+			cookbook := fastfood.NewCookbook(cookbookPath, args[0])
 
 			//TODO: These can be collapsed into a single function
 			if err := cookbook.GenDirs(); err != nil {
