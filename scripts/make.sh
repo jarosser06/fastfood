@@ -1,15 +1,17 @@
 #!/bin/bash
 
-pkg_dirs="util cookbook config helpers application"
-
 case $1 in
 "test")
+  pkg_dirs="cmd"
+
   for dir in $pkg_dirs
   do
-    pushd pkg/${dir} &> /dev/null
+    pushd ${dir} &> /dev/null
     go test
     popd &> /dev/null
   done
+
+  go test
   ;;
 "build")
   mkdir -p ${GOPATH}/src/github.com/jarosser06
