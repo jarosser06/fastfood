@@ -10,10 +10,6 @@ import (
 	"github.com/jarosser06/fastfood"
 )
 
-const (
-	tempPackEnvVar = "FASTFOOD_TEMPLATE_PACK"
-)
-
 type Generator struct {
 	MappedArgs    map[string]string
 	TemplatesPath string
@@ -36,21 +32,12 @@ func MapArgs(args []string) map[string]string {
 	return argMap
 }
 
-func DefTempPack() string {
-	packEnv := os.Getenv("FASTFOOD_TEMPLATE_PACK")
-	if packEnv == "" {
-		return path.Join(os.Getenv("HOME"), "fastfood")
-	} else {
-		return packEnv
-	}
-}
-
 func (g *Generator) Run(args []string) int {
+	var templatePack string
 	workingDir, _ := os.Getwd()
 	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(g.Help()) }
-
-	templatePack := *cmdFlags.String("templates-pack", DefTempPack(), "path to the templates directory")
+	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		return 1
@@ -73,8 +60,8 @@ func (g *Generator) Run(args []string) int {
 		// Remove the first arg as the command
 		genCommand, args := args[0], args[1:len(args)]
 
-		commands := ParseCommandsFromFile(cmdManifest)
-		if _, ok := commands[genCommand]; ok {
+		manifest := NewManifest(cmdManifest)
+		if _, ok := manifest.Providers[genCommand]; ok {
 			goto CMDFound
 		}
 
@@ -87,7 +74,7 @@ func (g *Generator) Run(args []string) int {
 
 		p, err := fastfood.NewProviderFromFile(
 			ckbk,
-			path.Join(templatePack, commands[genCommand].Manifest),
+			path.Join(templatePack, manifest.Providers[genCommand].Manifest),
 		)
 
 		if err != nil {
