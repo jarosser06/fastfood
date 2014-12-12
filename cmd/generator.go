@@ -78,9 +78,11 @@ func (g *Generator) Run(args []string) int {
 		)
 
 		// No point in setting up a whole flag set here
-		if args[0] == "-h" {
-			fmt.Println(p.Help())
-			return 0
+		if len(args) > 0 {
+			if args[0] == "-h" {
+				fmt.Println(p.Help())
+				return 0
+			}
 		}
 
 		if err != nil {
