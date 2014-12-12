@@ -4,12 +4,11 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"time"
-
-	"github.com/GeertJohan/go.rice"
 )
 
 type OSTarget struct {
@@ -97,24 +96,16 @@ func PathIsCookbook(cookbookPath string) bool {
 	}
 }
 
-func (c *Cookbook) GenFiles() error {
+func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error {
 
-	cookbookFiles := [8]string{
-		"Berksfile",
-		"CHANGELOG.md",
-		"Gemfile",
-		"metadata.rb",
-		"README.md",
-		"recipes/default.rb",
-		"test/unit/spec/default_spec.rb",
-		"test/unit/spec/spec_helper.rb",
-	}
-
-	templateBox, _ := rice.FindBox("../templates/cookbook")
 	for _, cookbookFile := range cookbookFiles {
-		tmpStr, _ := templateBox.String(cookbookFile)
+		tempStr, err := ioutil.ReadFile(path.Join(templatesPath, cookbookFile))
 
-		t, err := NewTemplate(cookbookFile, c, []string{tmpStr})
+		if err != nil {
+			return errors.New(fmt.Sprintf("cookbook.GenFiles() reading template file: %v", err))
+		}
+
+		t, err := NewTemplate(cookbookFile, c, []string{string(tempStr)})
 		if err != nil {
 			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
 		}
@@ -128,24 +119,13 @@ func (c *Cookbook) GenFiles() error {
 	return nil
 }
 
-func (c *Cookbook) GenDirs() error {
+func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 	err := os.Mkdir(c.Path, 0755)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Gendirs(): %v", err))
+		return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
 	}
 
-	dirs := [10]string{
-		"attributes",
-		"files",
-		"libraries",
-		"providers",
-		"recipes",
-		"resources",
-		"templates",
-		"test/unit/spec",
-	}
-
-	for _, dir := range dirs {
+	for _, dir := range cookbookDirs {
 		err := os.MkdirAll(path.Join(c.Path, dir), 0755)
 		if err != nil {
 			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))

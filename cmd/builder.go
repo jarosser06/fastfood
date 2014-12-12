@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"path"
 
 	"github.com/jarosser06/fastfood"
 )
@@ -16,15 +17,18 @@ func (b *Builder) Help() string {
 }
 
 func (b *Builder) Run(args []string) int {
-	var config, cookbookPath string
+	var config, cookbookPath, templatePack string
 	cmdFlags := flag.NewFlagSet("builder", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(b.Help()) }
 	cmdFlags.StringVar(&cookbookPath, "cookbooks-dir", "", "directory to store new cookbook")
-	cmdFlags.StringVar(&config, "config", "", "json config to build from")
+	cmdFlags.StringVar(&config, "config", "", "json config to build from NOT IMPLEMENTED")
+	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		return 1
 	}
+
+	manifest := NewManifest(path.Join(templatePack, "manifest.json"))
 
 	args = cmdFlags.Args()
 
@@ -35,12 +39,13 @@ func (b *Builder) Run(args []string) int {
 			cookbook := fastfood.NewCookbook(cookbookPath, args[0])
 
 			//TODO: These can be collapsed into a single function
-			if err := cookbook.GenDirs(); err != nil {
+			if err := cookbook.GenDirs(manifest.Cookbook.Directories); err != nil {
 				fmt.Println(err)
 				return 1
 			}
 
-			if err := cookbook.GenFiles(); err != nil {
+			templatePath := path.Join(templatePack, manifest.Cookbook.TemplatesPath)
+			if err := cookbook.GenFiles(manifest.Cookbook.Files, templatePath); err != nil {
 				fmt.Println(err)
 				return 1
 			}

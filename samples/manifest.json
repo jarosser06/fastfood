@@ -1,5 +1,5 @@
 {
-  "commands": {
+  "providers": {
     "database": {
       "name": "database",
       "manifest": "database/manifest.json",
@@ -10,5 +10,28 @@
       "manifest": "application/manifest.json",
       "help": "Creates an application recipe based on the type, defaults to Generic"
     }
+  },
+  "cookbook": {
+    "templates_path": "cookbook",
+    "files": [
+      "Berksfile",
+      "CHANGELOG.md",
+      "Gemfile",
+      "metadata.rb",
+      "README.md",
+      "recipes/default.rb",
+      "test/unit/spec/default_spec.rb",
+      "test/unit/spec/spec_helper.rb"
+    ],
+    "directories": [
+      "attributes",
+      "files",
+      "libraries",
+      "providers",
+      "recipes",
+      "resources",
+      "templates",
+      "test/unit/spec"
+    ]
   }
 }
