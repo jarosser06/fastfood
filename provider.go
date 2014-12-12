@@ -181,3 +181,40 @@ func (p *Provider) GenDirs(typeName string) error {
 
 	return nil
 }
+
+// Print Provider help
+func (p *Provider) Help() string {
+	var globalOpts, providerTypes []string
+	for name, opt := range p.Opts {
+		var help string
+		if opt.Help == "" {
+			help = "NO HELP FOUND"
+		} else {
+			help = opt.Help
+		}
+
+		globalOpts = append(
+			globalOpts,
+			fmt.Sprintf("  %-15s - %s", name, help),
+		)
+	}
+
+	for providerType := range p.Types {
+		providerTypes = append(
+			providerTypes,
+			fmt.Sprintf("  %s", providerType),
+		)
+	}
+	helpText := fmt.Sprintf(`
+Default Type: %s
+
+Global Options:
+
+%s
+
+Provider Types:
+
+%s
+`, p.DefaultType, strings.Join(globalOpts, "\n\n"), strings.Join(providerTypes, "\n\n"))
+	return helpText
+}

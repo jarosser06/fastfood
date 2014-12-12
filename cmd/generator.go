@@ -77,6 +77,12 @@ func (g *Generator) Run(args []string) int {
 			path.Join(templatePack, manifest.Providers[genCommand].Manifest),
 		)
 
+		// No point in setting up a whole flag set here
+		if args[0] == "-h" {
+			fmt.Println(p.Help())
+			return 0
+		}
+
 		if err != nil {
 			fmt.Println("Error loading provider %s: %v", genCommand, err)
 			return 1
@@ -124,7 +130,7 @@ func (g *Generator) Synopsis() string {
 // Autogenerate based on commands parsed
 func (g *Generator) Help() string {
 	helpText := `
-Usage: fastfood gen [provider] [options]
+Usage: fastfood gen <flags> [provider] [options]
 
   This will generate a recipe and spec file
   based on the provider and options you
@@ -136,13 +142,10 @@ Usage: fastfood gen [provider] [options]
 
   name:recipe_name
 
-Generators:
+  Flags:
 
-  db     - Creates a database recipe based
-           on the type, defaults to MySQL
-
-  app    - Creates an application recipe
-           based on the type, defaults to Generic`
+    -template-pack=<path>  - is optional
+`
 
 	return helpText
 }
