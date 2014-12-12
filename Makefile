@@ -1,5 +1,4 @@
 export GOPATH := ${PWD}/.gopath
-export RICEBIN := ${GOPATH}/bin/rice
 
 all: deps build
 
@@ -9,15 +8,6 @@ build:
 
 deps:
 		scripts/deps.sh
-
-rice:
-		@echo "Compiling templates..."
-		go get github.com/GeertJohan/go.rice/rice
-		go install github.com/GeertJohan/go.rice/rice
-		${RICEBIN} -i ./provider/cookbook clean
-		${RICEBIN} -i ./provider/cookbook embed-go
-		${RICEBIN} -i ./provider/application clean
-		${RICEBIN} -i ./provider/application embed-go
 
 test:
 		@echo "Running tests..."
