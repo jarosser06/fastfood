@@ -1,20 +1,21 @@
 .\" Manpage for fastfood.
-.TH man 8 "26 November 2014" "0.0.1" "fastfood man page"
+.TH man 8 "12 December 2014" "0.1.0" "fastfood man page"
 .SH NAME
 fastfood \- a chef helper
 .SH SYNOPSIS
 fastfood [COMMAND] [OPTIONS]
 .SH DESCRIPTION
 fastfood helps generate new cookbooks and recipes for
-existing recipes.
+existing cookbooks.
 .SH COMMANDS
 .SS NEW
 .B fastfood new
-[\fB-cookbooks-dir\fR \fICOOKBOOKSDIR\fR]
+[\fB-cookbooks-dir=\fR\fICOOKBOOKSDIR\fR]
 [COOKBOOKNAME]
 
 .SS GEN
 .B fastfood gen
+[\fB-template-pack=\fR\fIPATH\fI]
 [\fIPROVIDER\fR]
 .IR options ...
 
@@ -23,69 +24,83 @@ existing recipes.
 All provider options are passed using a key:value notation.
 \n
 \-
-Node attributes passed should render correctly without being wrapped
-in quotes.
-.SH PROVIDERS
-.SS DB
-.BR fastfood
-.BR gen
-.BR db
-[\fIOPTIONS\fR]
+Node attributes using node['*'] and node.* passed should render
+correctly without being wrapped in quotes.
+.SH MANIFESTS
+.SS BASE
+The base manifest is found at the root of the template pack.  This
+manifest is how fastfood knows what cookbook files to generate
+and what providers are available to it.
 \n
-.BR name\ \-
-The name of the recipe
+A sample base manifest:
 \n
-.BR database\ \-
-The name of the database to create. Not used if the role is a slave.
+.P
+{
+  "providers": {
+    "a_provider": {
+      "name": "a_provider",
+      "manifest": "a_provider/manifest.json",
+      "help": "Some info about the provider"
+    }
+  },
+  "cookbook": {
+    "files": [
+      "metadata.rb",
+      "README.md"
+    ],
+    "directories": [
+      "attributes",
+      "files",
+      "libraries",
+      "providers",
+      "recipes",
+      "resources",
+      "templates"
+    ]
+  }
+
+}
+.B
+.SS PROVIDER
+The provider manifest describes a provider and all of the available
+types in that provider.  There is no restriction on naming a provider,
+how many options a provider can have or even how many types a provider
+can have.  A providers types also have the ability to override option
+defaults.
 \n
-.BR databag\ \-
-The name of the data bag to load the mysql username and password from.
-Not used if the role is a slave.
+A provider type's files takes a map with the name of the file to be
+written as the key and the template file included in the pack as
+the argument.
 \n
-.BR openfor\ \-
-Tag used to search nodes and create port openings for. For postgres
-this includes adding the appropriate entries in pg_hba if the
-database is set.
-\n
-.BR user\ \-
-Username to use with the database setting, if database is not set
-the user is meaningless. Not used if the role is a slave.
-\n
-.BR password\ \-
-Password used for the user. Not used if the role is a slave.
-\n
-.BR role\ \-
-The database role, can be either a slave or master
-\n
-.BR type\ \-
-The type of data base to render.  Valid options are \fImysql\fR
-and \fIpostgres\fR.  Defaults to mysql
-\n
-.SS Application
-.BR fastfood
-.BR gen
-.BR app
-[\fIOPTIONS\fR]
-\n
-.BR name\ \-
-The name of the recipe
-\n
-.BR repo\ \-
-The name of the repo to deploy from.
-\n
-.BR revision\ \-
-The name of the revision to deploy.
-\n
-.BR root\ \-
-The root directory to deploy the application to.
-\n
-.BR type\ \-
-The type of application to deploy, defaults to a generic application.
-\n
-.BR user\ \-
-The user to deploy and run the application as.
-\n
-.BR webserver\ \-
-The webserver to use with the application.  Valid options are
-nginx and apache, defaults to apache.
-\n
+A Sample provider manifest:
+.P
+{
+  "id": "webserver",
+  "default_type": "nginx",
+  "dependencies": [
+    "iptables",
+  ],
+  "options": {
+    "name":" {
+      "help": "Name of the recipe to create",
+      "default": "my_provider"
+    }
+  },
+  "types": {
+    "nginx": {
+      "dependencies": [
+        "nginx"
+      ],
+      "files": {
+        "recipes/<NAME>.rb": "recipes/nginx.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/nginx_spec.rb"
+      },
+      "options": {
+        "name": {
+          "default": "nginx_node"
+        }
+      }
+    }
+  }
+
+}
