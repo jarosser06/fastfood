@@ -5,7 +5,11 @@ import "testing"
 func TestNewManifest(t *testing.T) {
 	sampleFile := "../samples/manifest.json"
 
-	manifest := NewManifest(sampleFile)
+	manifest, err := NewManifest(sampleFile)
+
+	if err != nil {
+		t.Errorf("Did not expect error %v", err)
+	}
 
 	if len(manifest.Providers) != 2 {
 		t.Errorf("Expected the length of the commands array to be 2")

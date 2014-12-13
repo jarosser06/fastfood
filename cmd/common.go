@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,25 +29,29 @@ type Manifest struct {
 	}
 }
 
-func NewManifest(path string) Manifest {
+func NewManifest(path string) (Manifest, error) {
 
 	var manifest Manifest
 
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read file %s", path))
+		return manifest, errors.New(
+			fmt.Sprintf("reading manifest %s: %v", path, err),
+		)
 	}
 
 	err = json.Unmarshal(f, &manifest)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to parse json: %v", err))
+		return manifest, errors.New(
+			fmt.Sprintf("parsing manifest %s: %v", path, err),
+		)
 	}
 
 	if manifest.Cookbook.TemplatesPath == "" {
 		manifest.Cookbook.TemplatesPath = cookbookTemplates
 	}
 
-	return manifest
+	return manifest, nil
 
 }
 

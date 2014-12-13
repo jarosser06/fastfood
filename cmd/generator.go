@@ -60,7 +60,10 @@ func (g *Generator) Run(args []string) int {
 		// Remove the first arg as the command
 		genCommand, args := args[0], args[1:len(args)]
 
-		manifest := NewManifest(cmdManifest)
+		manifest, err := NewManifest(cmdManifest)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
 		if _, ok := manifest.Providers[genCommand]; ok {
 			goto CMDFound
 		}
