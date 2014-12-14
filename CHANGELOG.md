@@ -1,4 +1,4 @@
-## 0.1.0 (Unreleased)
+## 0.1.0 (14 Dec 2014)
 
 * Basic gen command that builds out Chef files (templates,
   recipes, tests, etc) based on a Template Pack
