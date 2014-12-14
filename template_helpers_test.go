@@ -13,7 +13,7 @@ func TestQString(t *testing.T) {
 	}
 
 	if res := s.QString(testNotMatch); res != testNotMatch {
-		t.Errorf("Expected %s but recieved %s", res)
+		t.Errorf("Expected node['cookbook']['attr'] but recieved %s", res)
 	}
 }
 
