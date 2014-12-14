@@ -3,8 +3,9 @@ export GOPATH := ${PWD}/.gopath
 all: deps build
 
 build:
-		@echo "Building binary..."
-		scripts/make.sh build
+		@echo "Building binaries..."
+		go get github.com/mitchellh/gox
+		${GOPATH}/bin/gox -os="linux darwin windows" -output="bin/fastfood_{{.OS}}_{{.Arch}}" ./cmd/main/
 
 deps:
 		scripts/deps.sh
