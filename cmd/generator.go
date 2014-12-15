@@ -58,7 +58,16 @@ func (g *Generator) Run(args []string) int {
 		}
 
 		// Remove the first arg as the command
-		genCommand, args := args[0], args[1:len(args)]
+		var genCommand string
+		if len(args) > 0 {
+			genCommand, args = args[0], args[1:len(args)]
+		} else {
+			//TODO: Return a list of providers
+			fmt.Println("TODO: Implement provider listing if no commands are passed")
+			return 1
+		}
+
+		fmt.Println(args)
 
 		manifest, err := NewManifest(cmdManifest)
 		if err != nil {
