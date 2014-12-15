@@ -89,7 +89,7 @@ func (g *Generator) Run(args []string) int {
 		}
 
 		if err != nil {
-			fmt.Println("Error loading provider %s: %v", genCommand, err)
+			fmt.Printf("Error loading provider %s: %v\n", genCommand, err)
 			return 1
 		}
 
