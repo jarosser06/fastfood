@@ -43,6 +43,8 @@ func (g *Generator) Run(args []string) int {
 		return 1
 	}
 
+	remainingArgs := cmdFlags.Args()
+
 	if fastfood.PathIsCookbook(workingDir) {
 		ckbk, err := fastfood.NewCookbookFromPath(workingDir)
 
@@ -57,22 +59,20 @@ func (g *Generator) Run(args []string) int {
 			return 1
 		}
 
-		// Remove the first arg as the command
-		var genCommand string
-		if len(args) > 0 {
-			genCommand, args = args[0], args[1:len(args)]
-		} else {
-			//TODO: Return a list of providers
-			fmt.Println("TODO: Implement provider listing if no commands are passed")
-			return 1
-		}
-
-		fmt.Println(args)
-
 		manifest, err := NewManifest(cmdManifest)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
+
+		// Remove the first arg as the command
+		var genCommand string
+		if len(remainingArgs) > 0 {
+			genCommand, remainingArgs = remainingArgs[0], remainingArgs[1:len(remainingArgs)]
+		} else {
+			fmt.Println(manifest.Help())
+			return 0
+		}
+
 		if _, ok := manifest.Providers[genCommand]; ok {
 			goto CMDFound
 		}
@@ -90,8 +90,8 @@ func (g *Generator) Run(args []string) int {
 		)
 
 		// No point in setting up a whole flag set here
-		if len(args) > 0 {
-			if args[0] == "-h" {
+		if len(remainingArgs) > 0 {
+			if remainingArgs[0] == "-h" {
 				fmt.Println(p.Help())
 				return 0
 			}
@@ -102,7 +102,7 @@ func (g *Generator) Run(args []string) int {
 			return 1
 		}
 
-		mappedArgs := MapArgs(args)
+		mappedArgs := MapArgs(remainingArgs)
 		var providerType string
 		if val, ok := mappedArgs["type"]; ok {
 			providerType = val

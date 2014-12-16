@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 const (
@@ -27,6 +28,30 @@ type Manifest struct {
 		Files         []string `json:"files"`
 		TemplatesPath string   `json:"templates_path"`
 	}
+}
+
+func (m *Manifest) Help() string {
+	var providersHelp []string
+
+	for name, provider := range m.Providers {
+		var help string
+		if provider.Help == "" {
+			help = "NO HELP FOUND"
+		} else {
+			help = provider.Help
+		}
+
+		providersHelp = append(
+			providersHelp,
+			fmt.Sprintf("  %-15s - %s", name, help),
+		)
+	}
+
+	return fmt.Sprintf(`
+Available Providers:
+
+%s
+`, strings.Join(providersHelp, "\n\n"))
 }
 
 func NewManifest(path string) (Manifest, error) {
