@@ -1,3 +1,8 @@
+## 0.1.1 (16 Dec 2014)
+
+* Fastfood no longer panics if no additional arguments are passed
+  to the gen command.  It now presents a list of providers available.
+
 ## 0.1.0 (14 Dec 2014)
 
 * Basic gen command that builds out Chef files (templates,
