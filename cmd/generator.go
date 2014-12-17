@@ -89,6 +89,11 @@ func (g *Generator) Run(args []string) int {
 			path.Join(templatePack, manifest.Providers[genCommand].Manifest),
 		)
 
+		if err != nil {
+			fmt.Printf("Error parsing provider: %v\n", err)
+			return 1
+		}
+
 		// No point in setting up a whole flag set here
 		if len(remainingArgs) > 0 {
 			if remainingArgs[0] == "-h" {
