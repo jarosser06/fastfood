@@ -1,3 +1,8 @@
+## 0.1.2 (17 Dec 2014)
+
+* Fastfood will now return an error if it cannot parse a provider
+  manifest.
+
 ## 0.1.1 (16 Dec 2014)
 
 * Fastfood no longer panics if no additional arguments are passed

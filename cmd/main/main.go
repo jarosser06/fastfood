@@ -8,7 +8,7 @@ import (
 	"github.com/mitchellh/cli"
 )
 
-const ffVersion = "0.1.1"
+const ffVersion = "0.1.2"
 
 func main() {
 	c := cli.NewCLI("fastfood", ffVersion)
