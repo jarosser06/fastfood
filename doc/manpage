@@ -7,6 +7,14 @@ fastfood [COMMAND] [OPTIONS]
 .SH DESCRIPTION
 fastfood helps generate new cookbooks and recipes for
 existing cookbooks.
+.SH ENVIRONMENT VARIABLES
+Some command options allow you to set defaults with environment variables
+but keep in mind that any arguments passed to the command will always
+get used over the defaults.
+\n
+.B COOKBOOKS=\fIPATH TO COOKBOOKS DIRECTORY\fR
+\n
+.B FASTFOOD_TEMPLATE_PACK=\fIPATH TO TEMPLATE PACK\fR
 .SH COMMANDS
 .SS NEW
 .B fastfood new
