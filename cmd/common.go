@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	tempPackEnvVar    = "FASTFOOD_TEMPLATE_PACK"
-	cookbookTemplates = "cookbook"
+	tempPackEnvVar     = "FASTFOOD_TEMPLATE_PACK"
+	cookbookPathEnvVar = "COOKBOOKS"
+	cookbookTemplates  = "cookbook"
 )
 
 type Manifest struct {
@@ -87,6 +88,12 @@ func DefaultTempPack() string {
 	} else {
 		return packEnv
 	}
+}
+
+func DefaultCookbookPath() string {
+	cookbookPath := os.Getenv(cookbookPathEnvVar)
+
+	return cookbookPath
 }
 
 // Translates key:value strings into a map
