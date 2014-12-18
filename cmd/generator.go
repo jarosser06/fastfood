@@ -16,10 +16,12 @@ type Generator struct {
 
 func (g *Generator) Run(args []string) int {
 	var templatePack string
+	var force bool
 	workingDir, _ := os.Getwd()
 	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(g.Help()) }
 	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
+	cmdFlags.BoolVar(&force, "force", false, "overwrite existing files")
 
 	if err := cmdFlags.Parse(args); err != nil {
 		return 1
@@ -109,6 +111,7 @@ func (g *Generator) Run(args []string) int {
 		err = p.GenFiles(
 			providerType,
 			path.Join(templatePack, genCommand),
+			force,
 			mappedArgs,
 		)
 
@@ -145,6 +148,7 @@ Usage: fastfood gen <flags> [provider] [options]
 
   Flags:
 
+    -force                 - whether to overwrite existing files
     -template-pack=<path>  - is optional
 `
 

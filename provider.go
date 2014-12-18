@@ -99,7 +99,7 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 }
 
 // Creates the expected struct for all templates and renders each template one by one
-func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[string]string) error {
+func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bool, opts map[string]string) error {
 
 	mergedOpts := p.MergeOpts(typeName, opts)
 	cappedMap := make(map[string]string)
@@ -121,7 +121,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[stri
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
+		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) && !forceWrite {
 			continue
 		}
 		var content []string
