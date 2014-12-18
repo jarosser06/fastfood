@@ -1,0 +1,11 @@
+{
+  "name": "testcookbook",
+  "cookbook_path": "/home/jim/cookbooks",
+  "providers": [
+    {
+      "provider": "database",
+      "database": "mydb",
+      "databag": "db_credentials"
+    }
+  ]
+}

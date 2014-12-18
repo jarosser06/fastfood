@@ -8,15 +8,13 @@ import (
 )
 
 type Config struct {
-	Applications []map[string]string `json:"applications,omitempty"`
 	CookbookPath string              `json:"cookbook_path,omitempty"`
-	Databases    []map[string]string `json:"database,omitempty"`
 	Name         string              `json:"name,omitempty"`
-	Queues       []map[string]string `json:"queues,omitempty"`
+	Providers    []map[string]string `json:"providers,omitempty"`
 	Target       []string            `json:"target,omitempty"`
 }
 
-func Parse(path string) (Config, error) {
+func NewConfig(path string) (Config, error) {
 	var c Config
 
 	file, err := ioutil.ReadFile(path)

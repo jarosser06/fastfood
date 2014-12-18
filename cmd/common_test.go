@@ -3,7 +3,7 @@ package cmd
 import "testing"
 
 func TestNewManifest(t *testing.T) {
-	sampleFile := "../samples/manifest.json"
+	sampleFile := "../tests/templatepack/manifest.json"
 
 	manifest, err := NewManifest(sampleFile)
 

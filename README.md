@@ -50,28 +50,21 @@ Uses a json config file to allow for pre-templating cookbooks:
 
 ```json
 {
-  "id": "123456-customer",
+  "name": "123456-customer",
   "cookbook_path": "/home/jim/cookbooks",
-  "applications": [
+  "providers": [
     {
+      "provider": "django_app",
       "name": "application1",
-      "type": "python",
-      "repo": "github.com:customer/application1",
-      "docroot": "/var/www/application1",
-      "webserver": "nginx"
+      "type": "nginx",
+      "repo": "git@github.com:customer/application1",
+      "root": "/var/www"
     },
     {
       "name": "application2",
       "type": "nodejs",
       "repo": "github.com:customer/application2",
       "docroot": "/var/www/application2"
-    }
-  ],
-  "databases": [
-    {
-      "type": "mysql",
-      "name": "customerdb",
-      "user": "db_user"
     }
   ]
 }
