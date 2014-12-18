@@ -30,3 +30,13 @@ func TestNewManifest(t *testing.T) {
 		t.Errorf("Expected more than 0 cookbook files")
 	}
 }
+
+func TestMapArgs(t *testing.T) {
+	args := []string{"name:testing"}
+
+	mappedArgs := MapArgs(args)
+
+	if val, ok := mappedArgs["name"]; !ok && val == "testing" {
+		t.Errorf("Expected a map with a key of name and value of testing")
+	}
+}

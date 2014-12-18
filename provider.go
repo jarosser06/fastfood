@@ -10,25 +10,23 @@ import (
 	"strings"
 )
 
-type ProviderType struct {
-	Deps        []string           `json:"dependencies"`
-	Directories []string           `json:"directories"`
-	Files       map[string]string  `json:"files"`
-	Opts        map[string]Options `json:"options"`
-	Partials    []string           `json:"partials"`
-}
-
-type Options struct {
+type Option struct {
 	DefaultValue string `json:"default"`
 	Help         string `json:"help"`
 }
 
 type Provider struct {
 	Cookbook    Cookbook
-	DefaultType string                  `json:"default_type"`
-	Deps        []string                `json:"dependencies"`
-	Opts        map[string]Options      `json:"options"`
-	Types       map[string]ProviderType `json:"types"`
+	DefaultType string            `json:"default_type"`
+	Deps        []string          `json:"dependencies"`
+	Opts        map[string]Option `json:"options"`
+	Types       map[string]struct {
+		Deps        []string          `json:"dependencies"`
+		Directories []string          `json:"directories"`
+		Files       map[string]string `json:"files"`
+		Opts        map[string]Option `json:"options"`
+		Partials    []string          `json:"partials"`
+	}
 }
 
 // Return a new provider, not extremley helpful atm
