@@ -134,17 +134,27 @@ func (g *Generator) Synopsis() string {
 // Autogenerate based on commands parsed
 func (g *Generator) Help() string {
 	helpText := `
-Usage: fastfood gen <flags> [provider] [options]
+Usage:
+  Without a configuration file:
+    fastfood gen <flags> [provider] [options]
 
-  This will generate a recipe and spec file
-  based on the provider and options you
-  provide that provider.
+    This will generate a recipe and spec file
+    based on the provider and options you
+    provide that provider.
 
-  Options are passed using using a key:value
-  notation so to set the name you would use
-  the following:
+    Options are passed using using a key:value
+    notation so to set the name you would use
+    the following:
 
-  name:recipe_name
+    name:recipe_name
+
+  With a configuration file:
+    fastfood gen <flags> [config_file]
+
+    Because fastfood deafults to not overwriting
+    existing files unless explicitly told to,
+    you can modify existing configs and re-run
+    fastfood against them to generate new files.
 
   Flags:
 
