@@ -28,7 +28,7 @@ func (b *Builder) Run(args []string) int {
 		return 1
 	}
 
-	manifest, err := NewManifest(path.Join(templatePack, "manifest.json"))
+	manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}

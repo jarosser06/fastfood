@@ -43,7 +43,7 @@ func (g *Generator) Run(args []string) int {
 			return 1
 		}
 
-		manifest, err := NewManifest(cmdManifest)
+		manifest, err := fastfood.NewManifest(cmdManifest)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 		}
