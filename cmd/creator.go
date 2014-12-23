@@ -27,7 +27,7 @@ Usage:
 }
 
 func (c *Creator) Run(args []string) int {
-	var config, cookbookPath, templatePack string
+	var cookbookPath, templatePack string
 	cmdFlags := flag.NewFlagSet("creator", flag.ContinueOnError)
 	cmdFlags.Usage = func() { fmt.Println(c.Help()) }
 	cmdFlags.StringVar(&cookbookPath, "cookbooks-dir", "", "directory to store new cookbook")
@@ -44,28 +44,24 @@ func (c *Creator) Run(args []string) int {
 
 	args = cmdFlags.Args()
 
-	if len(config) > 0 {
-		fmt.Println("Placeholder for generating from a config")
-	} else {
-		if len(args) > 0 {
-			cookbook := fastfood.NewCookbook(cookbookPath, args[0])
+	if len(args) > 0 {
+		cookbook := fastfood.NewCookbook(cookbookPath, args[0])
 
-			//TODO: These can be collapsed into a single function
-			if err := cookbook.GenDirs(manifest.Cookbook.Directories); err != nil {
-				fmt.Println(err)
-				return 1
-			}
-
-			templatePath := path.Join(templatePack, manifest.Cookbook.TemplatesPath)
-			if err := cookbook.GenFiles(manifest.Cookbook.Files, templatePath); err != nil {
-				fmt.Println(err)
-				return 1
-			}
-
-		} else {
-			fmt.Println("You must enter the name of the cookbook")
+		//TODO: These can be collapsed into a single function
+		if err := cookbook.GenDirs(manifest.Cookbook.Directories); err != nil {
+			fmt.Println(err)
 			return 1
 		}
+
+		templatePath := path.Join(templatePack, manifest.Cookbook.TemplatesPath)
+		if err := cookbook.GenFiles(manifest.Cookbook.Files, templatePath); err != nil {
+			fmt.Println(err)
+			return 1
+		}
+
+	} else {
+		fmt.Println("You must enter the name of the cookbook")
+		return 1
 	}
 	return 0
 }
