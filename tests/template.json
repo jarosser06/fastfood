@@ -3,9 +3,16 @@
   "cookbook_path": "/home/jim/cookbooks",
   "providers": [
     {
+      "name": "db1",
       "provider": "database",
       "database": "mydb",
       "databag": "db_credentials"
+    },
+    {
+      "name": "db2",
+      "provider": "database",
+      "database": "mydb",
+      "databag": "db2_credentials"
     }
   ]
 }

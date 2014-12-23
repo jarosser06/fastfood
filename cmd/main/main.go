@@ -17,8 +17,11 @@ func main() {
 		"gen": func() (cli.Command, error) {
 			return &cmd.Generator{}, nil
 		},
-		"new": func() (cli.Command, error) {
+		"build": func() (cli.Command, error) {
 			return &cmd.Builder{}, nil
+		},
+		"new": func() (cli.Command, error) {
+			return &cmd.Creator{}, nil
 		},
 	}
 
