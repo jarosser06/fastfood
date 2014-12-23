@@ -1,24 +1,31 @@
 package cmd
 
+import (
+	"errors"
+	"sync"
+)
+
 type Builder struct {
-	CookbooksPath string
+	Common
+	WaitGroup sync.WaitGroup
 }
 
-func (b *Builder) Run(args []string) int {
+func (b *Builder) Run(args []string) error {
+	/*
+		manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
 
-	return 0
+		args = cmdFlags.Args()
+	*/
+	return errors.New("not implemented")
 }
 
-func (b *Builder) Synopsis() string {
+func (b *Builder) Description() string {
 	return "Creates a cookbook w/ providers from a config file"
 }
 
 func (b *Builder) Help() string {
-	return `
-Usage:
-  fastfood build <flags> [config_file]
-
-  This command will build a new cookbook or update an
-  existing one using a configuration file.
-`
+	return "fastfood build [config_file]"
 }

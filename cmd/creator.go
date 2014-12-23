@@ -1,71 +1,40 @@
 package cmd
 
 import (
-	"flag"
-	"fmt"
+	"errors"
 	"path"
 
 	"github.com/jarosser06/fastfood"
 )
 
 type Creator struct {
-	CookbooksPath string
+	Common
 }
 
 func (c *Creator) Help() string {
-	return `
-Usage:
-  fastfood new <flags> [cookbook_name]
-
-  Simple commmand that generates a new cookbook based on a template
-  from a templatepack.
-
-  Flags:
-    -cookbooks-dir=<directory>  - where to create the new cookbook
-    -template-pack=<path>       - path to the template pack to use
-`
+	return "fastfood new [cookbook_name]"
 }
 
-func (c *Creator) Run(args []string) int {
-	var cookbookPath, templatePack string
-	cmdFlags := flag.NewFlagSet("creator", flag.ContinueOnError)
-	cmdFlags.Usage = func() { fmt.Println(c.Help()) }
-	cmdFlags.StringVar(&cookbookPath, "cookbooks-dir", "", "directory to store new cookbook")
-	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
-
-	if err := cmdFlags.Parse(args); err != nil {
-		return 1
-	}
-
-	manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
-
-	args = cmdFlags.Args()
-
+func (c *Creator) Run(args []string) error {
 	if len(args) > 0 {
-		cookbook := fastfood.NewCookbook(cookbookPath, args[0])
+		cookbook := fastfood.NewCookbook(c.cookbookPath, args[0])
 
 		//TODO: These can be collapsed into a single function
-		if err := cookbook.GenDirs(manifest.Cookbook.Directories); err != nil {
-			fmt.Println(err)
-			return 1
+		if err := cookbook.GenDirs(c.Manifest.Cookbook.Directories); err != nil {
+			return err
 		}
 
-		templatePath := path.Join(templatePack, manifest.Cookbook.TemplatesPath)
-		if err := cookbook.GenFiles(manifest.Cookbook.Files, templatePath); err != nil {
-			fmt.Println(err)
-			return 1
+		templatePath := path.Join(c.templatePack, c.Manifest.Cookbook.TemplatesPath)
+		if err := cookbook.GenFiles(c.Manifest.Cookbook.Files, templatePath); err != nil {
+			return err
 		}
 
 	} else {
-		fmt.Println("You must enter the name of the cookbook")
-		return 1
+		return errors.New("You must enter the name of the cookbook")
 	}
-	return 0
+	return nil
 }
 
-func (c *Creator) Synopsis() string {
-	return "Creates a new cookbook"
+func (c *Creator) Description() string {
+	return "Simple commmand that generates a new cookbook based on a template from a templatepack."
 }
