@@ -21,10 +21,17 @@ type Command interface {
 }
 
 func main() {
+	cli.CommandHelpTemplate = `USAGE:
+	{{.Usage}}
+
+DESCRIPTION:
+	{{.Description}}
+`
 	app := cli.NewApp()
 	app.Name = "fastfood"
 	app.Usage = "Generates chef things from templates"
 	app.Version = ffVersion
+
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name: "template-pack, p",

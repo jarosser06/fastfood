@@ -43,7 +43,7 @@ func (m *Manifest) Help() string {
 	}
 
 	return fmt.Sprintf(`
-Available Providers:
+AVAILABLE PROVIDERS:
 
 %s
 `, strings.Join(providersHelp, "\n\n"))

@@ -204,13 +204,13 @@ func (p *Provider) Help() string {
 		)
 	}
 	helpText := fmt.Sprintf(`
-Default Type: %s
+DEFAULT TYPE: %s
 
-Global Options:
+GLOBAL OPTIONS:
 
 %s
 
-Provider Types:
+PROVIDER TYPES:
 
 %s
 `, p.DefaultType, strings.Join(globalOpts, "\n\n"), strings.Join(providerTypes, "\n\n"))
