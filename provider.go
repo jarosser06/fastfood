@@ -100,7 +100,6 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 
 // Creates the expected struct for all templates and renders each template one by one
 func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bool, opts map[string]string) error {
-
 	mergedOpts := p.MergeOpts(typeName, opts)
 	cappedMap := make(map[string]string)
 	for key, val := range mergedOpts {

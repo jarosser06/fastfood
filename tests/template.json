@@ -1,18 +1,15 @@
 {
   "name": "testcookbook",
-  "cookbook_path": "/home/jim/cookbooks",
   "providers": [
     {
-      "name": "db1",
-      "provider": "database",
-      "database": "mydb",
-      "databag": "db_credentials"
+      "name": "rabbitmq",
+      "provider": "rabbitmq"
     },
     {
-      "name": "db2",
-      "provider": "database",
-      "database": "mydb",
-      "databag": "db2_credentials"
+      "name": "myapp",
+      "provider": "rails_app",
+      "dbcredentials": "db_credentials",
+      "owner": "rails"
     }
   ]
 }
