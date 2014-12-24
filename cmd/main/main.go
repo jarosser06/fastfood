@@ -9,7 +9,7 @@ import (
 	"github.com/jarosser06/fastfood/cmd"
 )
 
-const ffVersion = "0.1.2"
+const ffVersion = "0.2.0beta1"
 
 type Command interface {
 	Help() string

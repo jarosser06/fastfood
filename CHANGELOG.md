@@ -1,5 +1,7 @@
 ## 0.2.0 (Unreleased)
 
+* Added a build command that allows for building cookbooks from
+  a json file.
 * Moved the manifest functionality from the fastfood/cmd package
 * Added a force flag to the gen command
 * Added trailing newline when appending to dependencies
