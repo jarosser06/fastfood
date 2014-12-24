@@ -121,15 +121,19 @@ func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error 
 }
 
 func (c *Cookbook) GenDirs(cookbookDirs []string) error {
-	err := os.Mkdir(c.Path, 0755)
-	if err != nil {
-		return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+	if !FileExist(c.Path) {
+		err := os.Mkdir(c.Path, 0755)
+		if err != nil {
+			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+		}
 	}
 
 	for _, dir := range cookbookDirs {
-		err := os.MkdirAll(path.Join(c.Path, dir), 0755)
-		if err != nil {
-			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+		if !FileExist(path.Join(c.Path, dir)) {
+			err := os.MkdirAll(path.Join(c.Path, dir), 0755)
+			if err != nil {
+				return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+			}
 		}
 	}
 
