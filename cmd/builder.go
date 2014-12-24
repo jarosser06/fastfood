@@ -1,66 +1,120 @@
 package cmd
 
 import (
-	"flag"
+	"errors"
 	"fmt"
+	"os"
 	"path"
+	"sync"
 
 	"github.com/jarosser06/fastfood"
 )
 
 type Builder struct {
-	CookbooksPath string
+	Common
+	config    fastfood.Config
+	waitGroup sync.WaitGroup
+}
+
+func (b *Builder) Run(args []string) error {
+	if len(args) == 0 {
+		return errors.New("missing argument configuration file")
+	}
+
+	configFile := args[0]
+	if !fastfood.FileExist(configFile) {
+		return errors.New(fmt.Sprintf("file does not exist %s", configFile))
+	}
+
+	var err error
+	b.config, err = fastfood.NewConfig(configFile)
+	if err != nil {
+		return err
+	}
+
+	cookbook := b.Cookbook(b.config.Name)
+
+	// Load the providers
+	providers, err := b.LoadProviders(cookbook)
+	if err != nil {
+		return err
+	}
+
+	if err := cookbook.GenDirs(b.Manifest.Cookbook.Directories); err != nil {
+		return err
+	}
+
+	templatePath := path.Join(b.templatePack, b.Manifest.Cookbook.TemplatesPath)
+	if err := cookbook.GenFiles(b.Manifest.Cookbook.Files, templatePath); err != nil {
+		return err
+	}
+
+	for _, provider := range b.config.Providers {
+		var providerType string
+		providerName := provider["provider"]
+		p := providers[providerName]
+
+		// Determine provider type
+		if val, ok := provider["type"]; ok {
+			providerType = val
+		} else {
+			if p.DefaultType == "" {
+				return errors.New(fmt.Sprintf("There is no default type for provider %s", provider["provider"]))
+			} else {
+				providerType = p.DefaultType
+			}
+		}
+
+		// Need to append the dependencies so they don't get placed twice
+		// TODO: This is a hack and should be handled a bit more elegantly
+		deps := p.Dependencies(providerType)
+		cookbook.AppendDependencies(deps)
+		cookbook.Dependencies = append(cookbook.Dependencies, deps...)
+		p.GenDirs(providerType)
+
+		err := p.GenFiles(
+			providerType,
+			path.Join(b.templatePack, providerName),
+			false,
+			provider,
+		)
+
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+// If this command is run from inside a cookbook we are going
+// to assume we want to modify this cookbook
+func (b *Builder) Cookbook(name string) fastfood.Cookbook {
+	workingDir, _ := os.Getwd()
+
+	if fastfood.PathIsCookbook(workingDir) {
+		cookbook, _ := fastfood.NewCookbookFromPath(workingDir)
+
+		if cookbook.Name == name {
+			return cookbook
+		}
+	}
+
+	var cookbookPath string
+	if b.config.CookbookPath != "" {
+		cookbookPath = b.config.CookbookPath
+	} else {
+		cookbookPath = b.cookbookPath
+	}
+
+	return fastfood.NewCookbook(cookbookPath, name)
+}
+
+func (b *Builder) Description() string {
+	return "Creates a cookbook w/ providers from a config file"
 }
 
 func (b *Builder) Help() string {
-	return "TODO: Add help text for new command"
-}
-
-func (b *Builder) Run(args []string) int {
-	var config, cookbookPath, templatePack string
-	cmdFlags := flag.NewFlagSet("builder", flag.ContinueOnError)
-	cmdFlags.Usage = func() { fmt.Println(b.Help()) }
-	cmdFlags.StringVar(&cookbookPath, "cookbooks-dir", "", "directory to store new cookbook")
-	cmdFlags.StringVar(&config, "config", "", "json config to build from NOT IMPLEMENTED")
-	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
-
-	if err := cmdFlags.Parse(args); err != nil {
-		return 1
-	}
-
-	manifest, err := NewManifest(path.Join(templatePack, "manifest.json"))
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-	}
-
-	args = cmdFlags.Args()
-
-	if len(config) > 0 {
-		fmt.Println("Placeholder for generating from a config")
-	} else {
-		if len(args) > 0 {
-			cookbook := fastfood.NewCookbook(cookbookPath, args[0])
-
-			//TODO: These can be collapsed into a single function
-			if err := cookbook.GenDirs(manifest.Cookbook.Directories); err != nil {
-				fmt.Println(err)
-				return 1
-			}
-
-			templatePath := path.Join(templatePack, manifest.Cookbook.TemplatesPath)
-			if err := cookbook.GenFiles(manifest.Cookbook.Files, templatePath); err != nil {
-				fmt.Println(err)
-				return 1
-			}
-
-		} else {
-			fmt.Println("You must enter the name of the cookbook")
-			return 1
-		}
-	}
-	return 0
-}
-
-func (b *Builder) Synopsis() string {
-	return "Builds a new cookbook"
+	return "fastfood build [config_file]"
 }

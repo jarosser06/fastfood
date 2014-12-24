@@ -1,3 +1,10 @@
+## 0.2.0 (Unreleased)
+
+* Moved the manifest functionality from the fastfood/cmd package
+* Added a force flag to the gen command
+* Added trailing newline when appending to dependencies
+* Added actual help to the new command
+
 ## 0.1.2 (17 Dec 2014)
 
 * Fastfood will now return an error if it cannot parse a provider

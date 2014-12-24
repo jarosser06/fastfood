@@ -1,90 +1,90 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path"
 	"strings"
+
+	"github.com/jarosser06/fastfood"
 )
 
 const (
-	tempPackEnvVar    = "FASTFOOD_TEMPLATE_PACK"
-	cookbookTemplates = "cookbook"
+	EnvTempPack      = "FASTFOOD_TEMPLATE_PACK"
+	EnvCookbooksPath = "COOKBOOKS"
 )
 
-type Manifest struct {
-	Providers map[string]struct {
-		Name          string `json:"name"`
-		Manifest      string `json:"manifest"`
-		Help          string `json:"help"`
-		templatesPath string
-	}
-
-	Cookbook struct {
-		Directories   []string `json:"directories"`
-		Files         []string `json:"files"`
-		TemplatesPath string   `json:"templates_path"`
-	}
+// Templatepack is the path to the templatepack
+// CookbookPath is the path to cookbooks
+// Manifest is loaded using LoadManifest
+type Common struct {
+	templatePack string
+	cookbookPath string
+	Manifest     fastfood.Manifest
 }
 
-func (m *Manifest) Help() string {
-	var providersHelp []string
+type ProviderMap map[string]fastfood.Provider
 
-	for name, provider := range m.Providers {
-		var help string
-		if provider.Help == "" {
-			help = "NO HELP FOUND"
-		} else {
-			help = provider.Help
+func (c *Common) SetCookbookPath(path string) {
+	c.cookbookPath = path
+}
+
+func (c *Common) SetTemplatePack(pack string) {
+	c.templatePack = pack
+}
+
+// Load the core manifest so we can provide
+// dynamic help options
+func (c *Common) LoadManifest() error {
+	baseManifest := path.Join(c.templatePack, "manifest.json")
+	if !fastfood.FileExist(baseManifest) {
+		return errors.New(fmt.Sprintf("Error no such file %s\n", baseManifest))
+	}
+
+	var err error
+	c.Manifest, err = fastfood.NewManifest(baseManifest)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//Load all providers into memory
+func (c *Common) LoadProviders(cookbook fastfood.Cookbook) (ProviderMap, error) {
+	providerMap := make(ProviderMap)
+
+	for name, provider := range c.Manifest.Providers {
+		p, err := fastfood.NewProviderFromFile(
+			cookbook,
+			path.Join(c.templatePack, provider.Manifest),
+		)
+
+		if err != nil {
+			return providerMap, errors.New(
+				fmt.Sprintf("error loading provider from manifest %v", err),
+			)
 		}
 
-		providersHelp = append(
-			providersHelp,
-			fmt.Sprintf("  %-15s - %s", name, help),
-		)
+		providerMap[name] = p
 	}
 
-	return fmt.Sprintf(`
-Available Providers:
-
-%s
-`, strings.Join(providersHelp, "\n\n"))
+	return providerMap, nil
 }
 
-func NewManifest(path string) (Manifest, error) {
+// Translates key:value strings into a map
+func MapArgs(args []string) map[string]string {
+	var argMap map[string]string
+	argMap = make(map[string]string)
 
-	var manifest Manifest
+	for _, arg := range args {
+		if strings.Contains(arg, ":") {
+			// Split at the first : in an arg
+			splitArg := strings.SplitN(arg, ":", 2)
 
-	f, err := ioutil.ReadFile(path)
-	if err != nil {
-		return manifest, errors.New(
-			fmt.Sprintf("reading manifest %s: %v", path, err),
-		)
+			argMap[splitArg[0]] = splitArg[1]
+		}
 	}
 
-	err = json.Unmarshal(f, &manifest)
-	if err != nil {
-		return manifest, errors.New(
-			fmt.Sprintf("parsing manifest %s: %v", path, err),
-		)
-	}
-
-	if manifest.Cookbook.TemplatesPath == "" {
-		manifest.Cookbook.TemplatesPath = cookbookTemplates
-	}
-
-	return manifest, nil
-
-}
-
-func DefaultTempPack() string {
-	packEnv := os.Getenv(tempPackEnvVar)
-	if packEnv == "" {
-		return path.Join(os.Getenv("HOME"), "fastfood")
-	} else {
-		return packEnv
-	}
+	return argMap
 }

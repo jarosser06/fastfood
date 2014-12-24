@@ -1,0 +1,15 @@
+{
+  "name": "testcookbook",
+  "providers": [
+    {
+      "name": "rabbitmq",
+      "provider": "rabbitmq"
+    },
+    {
+      "name": "myapp",
+      "provider": "rails_app",
+      "dbcredentials": "db_credentials",
+      "owner": "rails"
+    }
+  ]
+}

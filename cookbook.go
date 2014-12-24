@@ -79,6 +79,7 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 			return cookbook, errors.New("unable to determine cookbook name")
 		}
 
+		cookbook.Path = cookbookPath
 		return cookbook, nil
 	} else {
 		return cookbook, errors.New(
@@ -120,15 +121,19 @@ func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error 
 }
 
 func (c *Cookbook) GenDirs(cookbookDirs []string) error {
-	err := os.Mkdir(c.Path, 0755)
-	if err != nil {
-		return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+	if !FileExist(c.Path) {
+		err := os.Mkdir(c.Path, 0755)
+		if err != nil {
+			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+		}
 	}
 
 	for _, dir := range cookbookDirs {
-		err := os.MkdirAll(path.Join(c.Path, dir), 0755)
-		if err != nil {
-			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+		if !FileExist(path.Join(c.Path, dir)) {
+			err := os.MkdirAll(path.Join(c.Path, dir), 0755)
+			if err != nil {
+				return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+			}
 		}
 	}
 
@@ -154,6 +159,6 @@ func (c *Cookbook) AppendDependencies(dependencies []string) {
 
 	AppendFile(
 		path.Join(c.Path, "metadata.rb"),
-		fmt.Sprintf("\n%s", strings.Join(depBuffer, "\n")),
+		fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
 	)
 }

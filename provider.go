@@ -10,25 +10,23 @@ import (
 	"strings"
 )
 
-type ProviderType struct {
-	Deps        []string           `json:"dependencies"`
-	Directories []string           `json:"directories"`
-	Files       map[string]string  `json:"files"`
-	Opts        map[string]Options `json:"options"`
-	Partials    []string           `json:"partials"`
-}
-
-type Options struct {
+type Option struct {
 	DefaultValue string `json:"default"`
 	Help         string `json:"help"`
 }
 
 type Provider struct {
 	Cookbook    Cookbook
-	DefaultType string                  `json:"default_type"`
-	Deps        []string                `json:"dependencies"`
-	Opts        map[string]Options      `json:"options"`
-	Types       map[string]ProviderType `json:"types"`
+	DefaultType string            `json:"default_type"`
+	Deps        []string          `json:"dependencies"`
+	Opts        map[string]Option `json:"options"`
+	Types       map[string]struct {
+		Deps        []string          `json:"dependencies"`
+		Directories []string          `json:"directories"`
+		Files       map[string]string `json:"files"`
+		Opts        map[string]Option `json:"options"`
+		Partials    []string          `json:"partials"`
+	}
 }
 
 // Return a new provider, not extremley helpful atm
@@ -101,8 +99,7 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 }
 
 // Creates the expected struct for all templates and renders each template one by one
-func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[string]string) error {
-
+func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bool, opts map[string]string) error {
 	mergedOpts := p.MergeOpts(typeName, opts)
 	cappedMap := make(map[string]string)
 	for key, val := range mergedOpts {
@@ -123,7 +120,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, opts map[stri
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) {
+		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) && !forceWrite {
 			continue
 		}
 		var content []string
@@ -206,13 +203,13 @@ func (p *Provider) Help() string {
 		)
 	}
 	helpText := fmt.Sprintf(`
-Default Type: %s
+DEFAULT TYPE: %s
 
-Global Options:
+GLOBAL OPTIONS:
 
 %s
 
-Provider Types:
+PROVIDER TYPES:
 
 %s
 `, p.DefaultType, strings.Join(globalOpts, "\n\n"), strings.Join(providerTypes, "\n\n"))
