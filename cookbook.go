@@ -79,6 +79,7 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 			return cookbook, errors.New("unable to determine cookbook name")
 		}
 
+		cookbook.Path = cookbookPath
 		return cookbook, nil
 	} else {
 		return cookbook, errors.New(
