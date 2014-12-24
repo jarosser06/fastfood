@@ -1,7 +1,9 @@
 package cmd
 
 import (
-	"errors"
+	"flag"
+	"fmt"
+	"os"
 	"path"
 
 	"github.com/jarosser06/fastfood"
@@ -12,29 +14,56 @@ type Creator struct {
 }
 
 func (c *Creator) Help() string {
-	return "fastfood new [cookbook_name]"
+	return `
+Usage: fastfood new [cookbook_name]
+
+Flags:
+  -template-pack=<path>  - path to the template pack
+  -cookbooks-path=<path> - path to the cookbooks directory
+`
 }
 
-func (c *Creator) Run(args []string) error {
-	if len(args) > 0 {
-		cookbook := fastfood.NewCookbook(c.cookbookPath, args[0])
+func (c *Creator) Run(args []string) int {
+	envHome := os.Getenv("HOME")
+	var cookbooksPath string
+	cmdFlags := flag.NewFlagSet("new", flag.ContinueOnError)
+	cmdFlags.StringVar(&c.TemplatePack, "template-pack", DefaultTempPack(), "path to the template pack")
+	cmdFlags.StringVar(&cookbooksPath, "cookbooks-path", path.Join(envHome, "cookbooks"), "base cookbooks directory")
+	cmdFlags.Usage = func() { fmt.Println(c.Help()) }
+
+	if err := cmdFlags.Parse(args); err != nil {
+		fmt.Println(err)
+		return 1
+	}
+
+	if err := c.LoadManifest(); err != nil {
+		fmt.Println(err)
+		return 1
+	}
+
+	remainingArgs := flag.Args()
+	if len(remainingArgs) > 0 {
+		cookbook := fastfood.NewCookbook(cookbooksPath, remainingArgs[0])
 
 		//TODO: These can be collapsed into a single function
 		if err := cookbook.GenDirs(c.Manifest.Cookbook.Directories); err != nil {
-			return err
+			fmt.Println(err)
+			return 1
 		}
 
-		templatePath := path.Join(c.templatePack, c.Manifest.Cookbook.TemplatesPath)
+		templatePath := path.Join(c.TemplatePack, c.Manifest.Cookbook.TemplatesPath)
 		if err := cookbook.GenFiles(c.Manifest.Cookbook.Files, templatePath); err != nil {
-			return err
+			fmt.Println(err)
+			return 1
 		}
 
 	} else {
-		return errors.New("You must enter the name of the cookbook")
+		fmt.Println("You must enter the name of the cookbook")
+		return 1
 	}
-	return nil
+	return 0
 }
 
-func (c *Creator) Description() string {
-	return "Simple commmand that generates a new cookbook based on a template from a templatepack."
+func (c *Creator) Synopsis() string {
+	return "Creates a new empty cookbook"
 }

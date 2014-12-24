@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -16,20 +16,38 @@ type Builder struct {
 	waitGroup sync.WaitGroup
 }
 
-func (b *Builder) Run(args []string) error {
-	if len(args) == 0 {
-		return errors.New("missing argument configuration file")
+func (b *Builder) Run(args []string) int {
+	cmdFlags := flag.NewFlagSet("build", flag.ContinueOnError)
+	cmdFlags.StringVar(&b.TemplatePack, "template-pack", DefaultTempPack(), "path to the template pack")
+	cmdFlags.Usage = func() { fmt.Println(b.Help()) }
+
+	if err := cmdFlags.Parse(args); err != nil {
+		fmt.Println(err)
+		return 1
 	}
 
-	configFile := args[0]
+	if err := b.LoadManifest(); err != nil {
+		fmt.Println(err)
+		return 1
+	}
+
+	remainingArgs := cmdFlags.Args()
+	if len(remainingArgs) == 0 {
+		fmt.Println("missing argument configuration file")
+		return 1
+	}
+
+	configFile := remainingArgs[0]
 	if !fastfood.FileExist(configFile) {
-		return errors.New(fmt.Sprintf("file does not exist %s", configFile))
+		fmt.Printf("file does not exist %s", configFile)
+		return 1
 	}
 
 	var err error
 	b.config, err = fastfood.NewConfig(configFile)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return 1
 	}
 
 	cookbook := b.Cookbook(b.config.Name)
@@ -37,16 +55,19 @@ func (b *Builder) Run(args []string) error {
 	// Load the providers
 	providers, err := b.LoadProviders(cookbook)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return 1
 	}
 
 	if err := cookbook.GenDirs(b.Manifest.Cookbook.Directories); err != nil {
-		return err
+		fmt.Println(err)
+		return 1
 	}
 
-	templatePath := path.Join(b.templatePack, b.Manifest.Cookbook.TemplatesPath)
+	templatePath := path.Join(b.TemplatePack, b.Manifest.Cookbook.TemplatesPath)
 	if err := cookbook.GenFiles(b.Manifest.Cookbook.Files, templatePath); err != nil {
-		return err
+		fmt.Println(err)
+		return 1
 	}
 
 	for _, provider := range b.config.Providers {
@@ -59,7 +80,8 @@ func (b *Builder) Run(args []string) error {
 			providerType = val
 		} else {
 			if p.DefaultType == "" {
-				return errors.New(fmt.Sprintf("There is no default type for provider %s", provider["provider"]))
+				fmt.Printf("There is no default type for provider %s\n", provider["provider"])
+				return 1
 			} else {
 				providerType = p.DefaultType
 			}
@@ -74,18 +96,19 @@ func (b *Builder) Run(args []string) error {
 
 		err := p.GenFiles(
 			providerType,
-			path.Join(b.templatePack, providerName),
+			path.Join(b.TemplatePack, providerName),
 			false,
 			provider,
 		)
 
 		if err != nil {
-			return err
+			fmt.Println(err)
+			return 1
 		}
 
 	}
 
-	return nil
+	return 0
 }
 
 // If this command is run from inside a cookbook we are going
@@ -105,16 +128,23 @@ func (b *Builder) Cookbook(name string) fastfood.Cookbook {
 	if b.config.CookbookPath != "" {
 		cookbookPath = b.config.CookbookPath
 	} else {
-		cookbookPath = b.cookbookPath
+		cookbookPath = b.CookbookPath
 	}
 
 	return fastfood.NewCookbook(cookbookPath, name)
 }
 
-func (b *Builder) Description() string {
+func (b *Builder) Synopsis() string {
 	return "Creates a cookbook w/ providers from a config file"
 }
 
 func (b *Builder) Help() string {
-	return "fastfood build [config_file]"
+	return `
+Usage: fastfood build [config_file]
+
+  This will create/modify a cookbook and providers.
+
+Flags:
+  -template-pack=<path>   - path to the template pack
+`
 }

@@ -43,10 +43,10 @@ func (m *Manifest) Help() string {
 	}
 
 	return fmt.Sprintf(`
-AVAILABLE PROVIDERS:
+Available Providers:
 
 %s
-`, strings.Join(providersHelp, "\n\n"))
+`, strings.Join(providersHelp, "\n"))
 }
 
 func NewManifest(path string) (Manifest, error) {

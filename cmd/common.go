@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -18,25 +19,18 @@ const (
 // CookbookPath is the path to cookbooks
 // Manifest is loaded using LoadManifest
 type Common struct {
-	templatePack string
-	cookbookPath string
+	TemplatePack string
+	CookbookPath string
+	Force        bool
 	Manifest     fastfood.Manifest
 }
 
 type ProviderMap map[string]fastfood.Provider
 
-func (c *Common) SetCookbookPath(path string) {
-	c.cookbookPath = path
-}
-
-func (c *Common) SetTemplatePack(pack string) {
-	c.templatePack = pack
-}
-
 // Load the core manifest so we can provide
 // dynamic help options
 func (c *Common) LoadManifest() error {
-	baseManifest := path.Join(c.templatePack, "manifest.json")
+	baseManifest := path.Join(c.TemplatePack, "manifest.json")
 	if !fastfood.FileExist(baseManifest) {
 		return errors.New(fmt.Sprintf("Error no such file %s\n", baseManifest))
 	}
@@ -57,7 +51,7 @@ func (c *Common) LoadProviders(cookbook fastfood.Cookbook) (ProviderMap, error) 
 	for name, provider := range c.Manifest.Providers {
 		p, err := fastfood.NewProviderFromFile(
 			cookbook,
-			path.Join(c.templatePack, provider.Manifest),
+			path.Join(c.TemplatePack, provider.Manifest),
 		)
 
 		if err != nil {
@@ -87,4 +81,13 @@ func MapArgs(args []string) map[string]string {
 	}
 
 	return argMap
+}
+
+func DefaultTempPack() string {
+	packEnv := os.Getenv(EnvTempPack)
+	if packEnv == "" {
+		return path.Join(os.Getenv("HOME"), "fastfood")
+	} else {
+		return packEnv
+	}
 }
