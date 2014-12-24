@@ -17,7 +17,6 @@ type Generator struct {
 }
 
 func (g *Generator) Run(args []string) error {
-	var templatePack string
 	var force bool
 	workingDir, _ := os.Getwd()
 	cmdFlags := flag.NewFlagSet("gen", flag.ContinueOnError)
@@ -97,7 +96,7 @@ CMDFound:
 
 	err = p.GenFiles(
 		providerType,
-		path.Join(templatePack, genCommand),
+		path.Join(g.templatePack, genCommand),
 		force,
 		mappedArgs,
 	)
