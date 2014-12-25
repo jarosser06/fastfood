@@ -140,10 +140,11 @@ func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 	return nil
 }
 
-func (c *Cookbook) AppendDependencies(dependencies []string) {
-	var depBuffer []string
+// Returns a list of dependencies that were written
+func (c *Cookbook) AppendDependencies(dependencies []string) []string {
+	var depBuffer, newDeps []string
 
-	if len(dependencies) < 0 {
+	if len(dependencies) > 0 {
 		for _, dep := range dependencies {
 			exist := false
 
@@ -155,6 +156,8 @@ func (c *Cookbook) AppendDependencies(dependencies []string) {
 			}
 
 			if !exist {
+				// Keep track of all new dependencies
+				newDeps = append(newDeps, dep)
 				depBuffer = append(depBuffer, fmt.Sprintf("depends '%s'", dep))
 			}
 		}
@@ -164,4 +167,6 @@ func (c *Cookbook) AppendDependencies(dependencies []string) {
 			fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
 		)
 	}
+
+	return newDeps
 }

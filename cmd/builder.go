@@ -59,17 +59,20 @@ func (b *Builder) Run(args []string) int {
 		return 1
 	}
 
+	// Create the cookbook directories
 	if err := cookbook.GenDirs(b.Manifest.Cookbook.Directories); err != nil {
 		fmt.Println(err)
 		return 1
 	}
 
+	// Generate the core cookbook files
 	templatePath := path.Join(b.TemplatePack, b.Manifest.Cookbook.TemplatesPath)
 	if err := cookbook.GenFiles(b.Manifest.Cookbook.Files, templatePath); err != nil {
 		fmt.Println(err)
 		return 1
 	}
 
+	// Generate provider files
 	for _, provider := range b.config.Providers {
 		var providerType string
 		providerName := provider["provider"]
@@ -90,8 +93,8 @@ func (b *Builder) Run(args []string) int {
 		// Need to append the dependencies so they don't get placed twice
 		// TODO: This is a hack and should be handled a bit more elegantly
 		deps := p.Dependencies(providerType)
-		cookbook.AppendDependencies(deps)
-		cookbook.Dependencies = append(cookbook.Dependencies, deps...)
+		depsAppended := cookbook.AppendDependencies(deps)
+		cookbook.Dependencies = append(cookbook.Dependencies, depsAppended...)
 		p.GenDirs(providerType)
 
 		err := p.GenFiles(
