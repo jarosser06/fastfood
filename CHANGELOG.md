@@ -6,6 +6,8 @@
 * Added a force flag to the gen command
 * Added trailing newline when appending to dependencies
 * Added actual help to the new command
+* Dependency appending no longer appends extra newlines if there
+  are no dependencies.
 
 ## 0.1.2 (17 Dec 2014)
 

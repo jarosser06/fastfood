@@ -1,7 +1,9 @@
 fastfood
 ========
 
-###External Dependencies
+Makes Cookbooks faster by pre-templating them
+
+###Hacking
 This tool uses gpm for dependency management so you need to
 ensure that it is installed in order to build from source.
 
@@ -33,25 +35,25 @@ with single quotes around it:
 template 'templatename' do
 ```
 
-CLI Options
+Create an empty cookbookk:
 ```shell
-fastfood new 123456-customer
-
-fastfood gen app name:application1 type:python repo:git@github.com/cus/app1
-
-fastfood gen db name:mysql_master database:appdb
+fastfood new mycookbook
 ```
 
-Set configs, global being the default and then allow for overrides.
+Generate a set of recipes, etc where app is the provider:
+```shell
+fastfood gen app name:application1 type:python repo:git@github.com/cus/app1
+```
 
-Make Cookbooks faster by pre-templating them
+Build/modify an existing cookbook from a config:
+```shell
+fastfood build ./mycookbook.json
+```
 
 Uses a json config file to allow for pre-templating cookbooks:
-
 ```json
 {
   "name": "123456-customer",
-  "cookbook_path": "/home/jim/cookbooks",
   "providers": [
     {
       "provider": "django_app",
