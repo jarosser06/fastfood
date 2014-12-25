@@ -119,6 +119,7 @@ CMDFound:
 		return 1
 	}
 
+	fmt.Printf("Cookbook %s updated\n", ckbk.Path)
 	return 0
 }
 
@@ -138,8 +139,8 @@ Usage: fastfood gen <flags> [provider] [options]
   the following:
   name:recipe_name
 
-  Flags:
-    -template-pack=<path> - path to the template pack
-    -force                - overwrite any existing files
+Flags:
+  -template-pack=<path> - path to the template pack
+  -force                - overwrite any existing files
 `
 }

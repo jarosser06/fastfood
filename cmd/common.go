@@ -91,3 +91,12 @@ func DefaultTempPack() string {
 		return packEnv
 	}
 }
+
+func DefaultCookbooksPath() string {
+	pathEnv := os.Getenv(EnvCookbooksPath)
+	if pathEnv == "" {
+		return path.Join(os.Getenv("HOME"), "cookbooks")
+	} else {
+		return pathEnv
+	}
+}

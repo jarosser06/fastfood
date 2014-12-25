@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
@@ -40,4 +41,22 @@ func CapitalizeString(str string) string {
 	byteStr[0] = capletter[0]
 
 	return string(byteStr)
+}
+
+func CopyFile(source string, dest string) error {
+	if FileExist(dest) {
+		return errors.New("file already exists")
+	} else {
+		sourceBytes, err := ioutil.ReadFile(source)
+		if err != nil {
+			return err
+		}
+
+		err = ioutil.WriteFile(dest, sourceBytes, 0644)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
 }

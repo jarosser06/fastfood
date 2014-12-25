@@ -19,6 +19,7 @@ type Builder struct {
 func (b *Builder) Run(args []string) int {
 	cmdFlags := flag.NewFlagSet("build", flag.ContinueOnError)
 	cmdFlags.StringVar(&b.TemplatePack, "template-pack", DefaultTempPack(), "path to the template pack")
+	cmdFlags.StringVar(&b.CookbookPath, "cookbooks-path", DefaultCookbooksPath(), "path to the cookbooks directory")
 	cmdFlags.Usage = func() { fmt.Println(b.Help()) }
 
 	if err := cmdFlags.Parse(args); err != nil {
@@ -72,6 +73,16 @@ func (b *Builder) Run(args []string) int {
 		return 1
 	}
 
+	// Copy the template file to the cookbook if it doesn't exist in the cookbook
+	err = fastfood.CopyFile(configFile, path.Join(cookbook.Path, "fastfood.json"))
+	if err != nil {
+		// if the file exists then thats fine
+		if err.Error() != "file already exists" {
+			fmt.Println(err)
+			return 1
+		}
+	}
+
 	// Generate provider files
 	for _, provider := range b.config.Providers {
 		var providerType string
@@ -111,6 +122,7 @@ func (b *Builder) Run(args []string) int {
 
 	}
 
+	fmt.Printf("Cookbook %s updated\n", cookbook.Path)
 	return 0
 }
 
@@ -149,5 +161,6 @@ Usage: fastfood build [config_file]
 
 Flags:
   -template-pack=<path>   - path to the template pack
+  -cookbooks-path=<path>  - path to the cookbooks directory
 `
 }
