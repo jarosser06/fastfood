@@ -39,7 +39,7 @@ func (c *Creator) Run(args []string) int {
 		return 1
 	}
 
-	remainingArgs := flag.Args()
+	remainingArgs := cmdFlags.Args()
 	if len(remainingArgs) > 0 {
 		cookbook := fastfood.NewCookbook(cookbooksPath, remainingArgs[0])
 
