@@ -1,5 +1,5 @@
 export GOPATH := ${PWD}/.gopath
-export FFVERSION := 0.2.0alpha1
+export FFVERSION := 0.2.0alpha2
 export INSTALLPRE := /usr/local
 
 all: deps build
