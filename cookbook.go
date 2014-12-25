@@ -142,23 +142,26 @@ func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 
 func (c *Cookbook) AppendDependencies(dependencies []string) {
 	var depBuffer []string
-	for _, dep := range dependencies {
-		exist := false
 
-		for _, existing := range c.Dependencies {
-			if existing == dep {
-				exist = true
-				continue
+	if len(dependencies) < 0 {
+		for _, dep := range dependencies {
+			exist := false
+
+			for _, existing := range c.Dependencies {
+				if existing == dep {
+					exist = true
+					continue
+				}
+			}
+
+			if !exist {
+				depBuffer = append(depBuffer, fmt.Sprintf("depends '%s'", dep))
 			}
 		}
 
-		if !exist {
-			depBuffer = append(depBuffer, fmt.Sprintf("depends '%s'", dep))
-		}
+		AppendFile(
+			path.Join(c.Path, "metadata.rb"),
+			fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
+		)
 	}
-
-	AppendFile(
-		path.Join(c.Path, "metadata.rb"),
-		fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
-	)
 }
