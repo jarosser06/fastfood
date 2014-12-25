@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"os"
 	"path"
 
 	"github.com/jarosser06/fastfood"
@@ -24,11 +23,10 @@ Flags:
 }
 
 func (c *Creator) Run(args []string) int {
-	envHome := os.Getenv("HOME")
 	var cookbooksPath string
 	cmdFlags := flag.NewFlagSet("new", flag.ContinueOnError)
 	cmdFlags.StringVar(&c.TemplatePack, "template-pack", DefaultTempPack(), "path to the template pack")
-	cmdFlags.StringVar(&cookbooksPath, "cookbooks-path", path.Join(envHome, "cookbooks"), "base cookbooks directory")
+	cmdFlags.StringVar(&cookbooksPath, "cookbooks-path", DefaultCookbooksPath(), "base cookbooks directory")
 	cmdFlags.Usage = func() { fmt.Println(c.Help()) }
 
 	if err := cmdFlags.Parse(args); err != nil {

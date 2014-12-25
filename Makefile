@@ -7,7 +7,7 @@ all: deps build
 build:
 		@echo "Building binaries..."
 		go get github.com/mitchellh/gox
-		${GOPATH}/bin/gox -arch="amd64" -os="linux darwin windows" -output="bin/{{.OS}}_{{.Arch}}/fastfood" ./cmd/main/
+		@${GOPATH}/bin/gox -arch="amd64" -os="linux darwin windows" -output="bin/{{.OS}}_{{.Arch}}/fastfood" ./cmd/main/
 
 package: deps build
 		@echo "Packaging..."

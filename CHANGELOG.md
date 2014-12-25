@@ -1,5 +1,7 @@
 ## 0.2.0 (Unreleased)
 
+* Cookbooks built or modified with a json config have the config
+  added to the cookbook if it does not already exist.
 * Added a build command that allows for building cookbooks from
   a json file.
 * Moved the manifest functionality from the fastfood/cmd package
