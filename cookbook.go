@@ -162,10 +162,13 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 			}
 		}
 
-		AppendFile(
-			path.Join(c.Path, "metadata.rb"),
-			fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
-		)
+		// Don't append newlines if all dependencies are up to date
+		if len(depBuffer) > 0 {
+			AppendFile(
+				path.Join(c.Path, "metadata.rb"),
+				fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
+			)
+		}
 	}
 
 	return newDeps
