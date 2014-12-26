@@ -44,7 +44,7 @@ case $1 in
     ;;
   "Darwin")
     cp doc/manpage ${INSTALLPRE}/share/man/man1/fastfood.1
-    cp bin/linux_amd64/fastfood ${INSTALLPRE}/bin/
+    cp bin/darwin_amd64/fastfood ${INSTALLPRE}/bin/
     ;;
   *)
     echo "Unsuported platform for make install"
