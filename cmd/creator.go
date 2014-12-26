@@ -14,7 +14,7 @@ type Creator struct {
 
 func (c *Creator) Help() string {
 	return `
-Usage: fastfood new [cookbook_name]
+Usage: fastfood new <flags> [cookbook_name]
 
 Flags:
   -template-pack=<path>  - path to the template pack
