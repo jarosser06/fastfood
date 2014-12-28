@@ -101,6 +101,11 @@ func (b *Builder) Run(args []string) int {
 			}
 		}
 
+		if !p.ValidType(providerType) {
+			fmt.Printf("%s is not a valid type for provider %s\n", providerType, providerName)
+			return 1
+		}
+
 		// Need to append the dependencies so they don't get placed twice
 		// TODO: This is a hack and should be handled a bit more elegantly
 		deps := p.Dependencies(providerType)

@@ -103,6 +103,11 @@ CMDFound:
 		}
 	}
 
+	if !p.ValidType(providerType) {
+		fmt.Printf("%s is not a valid type for provider %s\n", providerType, genCommand)
+		return 1
+	}
+
 	// Add the needed dependencies to the metadata
 	ckbk.AppendDependencies(p.Dependencies(providerType))
 	p.GenDirs(providerType)
