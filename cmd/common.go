@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -32,7 +31,7 @@ type ProviderMap map[string]fastfood.Provider
 func (c *Common) LoadManifest() error {
 	baseManifest := path.Join(c.TemplatePack, "manifest.json")
 	if !fastfood.FileExist(baseManifest) {
-		return errors.New(fmt.Sprintf("Error no such file %s\n", baseManifest))
+		return fmt.Errorf("Error no such file %s\n", baseManifest)
 	}
 
 	var err error
@@ -55,9 +54,7 @@ func (c *Common) LoadProviders(cookbook fastfood.Cookbook) (ProviderMap, error) 
 		)
 
 		if err != nil {
-			return providerMap, errors.New(
-				fmt.Sprintf("error loading provider from manifest %v", err),
-			)
+			return providerMap, fmt.Errorf("error loading provider from manifest %v", err)
 		}
 
 		providerMap[name] = p

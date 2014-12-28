@@ -2,7 +2,6 @@ package fastfood
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -44,12 +43,12 @@ func NewProviderFromFile(ckbk Cookbook, file string) (Provider, error) {
 	f, err := ioutil.ReadFile(file)
 	// Probably shouldn't Panic, might scare people
 	if err != nil {
-		return provider, errors.New(fmt.Sprintf("Failed to read file %s: %v", file, err))
+		return provider, fmt.Errorf("Failed to read file %s: %v", file, err)
 	}
 
 	err = json.Unmarshal(f, &provider)
 	if err != nil {
-		return provider, errors.New(fmt.Sprintf("Failed to unmarshal provider json: %v", err))
+		return provider, fmt.Errorf("Failed to unmarshal provider json: %v", err)
 	}
 
 	return provider, nil
@@ -126,14 +125,14 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 		var content []string
 		b, err := ioutil.ReadFile(path.Join(templatesPath, templateFile))
 		if err != nil {
-			return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
+			return fmt.Errorf("provider.GenFiles() reading file returned %v", err)
 		}
 
 		content = append(content, string(b))
 		for _, partial := range partials {
 			b, err := ioutil.ReadFile(path.Join(templatesPath, partial))
 			if err != nil {
-				return errors.New(fmt.Sprintf("provider.GenFiles() reading file returned %v", err))
+				return fmt.Errorf("provider.GenFiles() reading file returned %v", err)
 			}
 
 			content = append(content, string(b))
@@ -142,13 +141,13 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 		t, err := NewTemplate(cookbookFile, templateOpts, content)
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("Error creating template: %v", err))
+			return fmt.Errorf("Error creating template: %v", err)
 		}
 
 		t.CleanNewlines()
 
 		if err := t.Flush(path.Join(p.Cookbook.Path, cookbookFile)); err != nil {
-			return errors.New(fmt.Sprintf("Error writing file: %v", err))
+			return fmt.Errorf("Error writing file: %v", err)
 		}
 	}
 	return nil
@@ -171,7 +170,7 @@ func (p *Provider) GenDirs(typeName string) error {
 			err := os.MkdirAll(path.Join(p.Cookbook.Path, dir), 0755)
 
 			if err != nil {
-				return errors.New(fmt.Sprintf("database.GenDirs(): %v", err))
+				return fmt.Errorf("database.GenDirs(): %v", err)
 			}
 		}
 	}

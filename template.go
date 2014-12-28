@@ -2,7 +2,6 @@ package fastfood
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -29,7 +28,7 @@ func NewTemplate(name string, values interface{}, content []string) (*Template, 
 		_, err := temp.Parse(cont)
 
 		if err != nil {
-			err = errors.New(fmt.Sprintf("NewTemplate() error parsing content %v", err))
+			err = fmt.Errorf("NewTemplate() error parsing content %v", err)
 			return &Template{}, err
 		}
 	}

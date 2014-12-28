@@ -44,9 +44,7 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 		f, err := os.Open(path.Join(cookbookPath, "metadata.rb"))
 
 		if err != nil {
-			return cookbook, errors.New(
-				fmt.Sprintf("cookbook.NewCookbookFromPath: %v", err),
-			)
+			return cookbook, fmt.Errorf("cookbook.NewCookbookFromPath: %v", err)
 		}
 
 		defer f.Close()
@@ -103,17 +101,17 @@ func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error 
 		tempStr, err := ioutil.ReadFile(path.Join(templatesPath, cookbookFile))
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("cookbook.GenFiles() reading template file: %v", err))
+			return fmt.Errorf("cookbook.GenFiles() reading template file: %v", err)
 		}
 
 		t, err := NewTemplate(cookbookFile, c, []string{string(tempStr)})
 		if err != nil {
-			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
+			return fmt.Errorf("cookbook.GenFiles(): %v", err)
 		}
 
 		t.CleanNewlines()
 		if err := t.Flush(path.Join(c.Path, cookbookFile)); err != nil {
-			return errors.New(fmt.Sprintf("cookbook.GenFiles(): %v", err))
+			return fmt.Errorf("cookbook.GenFiles(): %v", err)
 		}
 	}
 
@@ -124,7 +122,7 @@ func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 	if !FileExist(c.Path) {
 		err := os.Mkdir(c.Path, 0755)
 		if err != nil {
-			return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+			return fmt.Errorf("cookbook.Gendirs(): %v", err)
 		}
 	}
 
@@ -132,7 +130,7 @@ func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 		if !FileExist(path.Join(c.Path, dir)) {
 			err := os.MkdirAll(path.Join(c.Path, dir), 0755)
 			if err != nil {
-				return errors.New(fmt.Sprintf("cookbook.Gendirs(): %v", err))
+				return fmt.Errorf("cookbook.Gendirs(): %v", err)
 			}
 		}
 	}

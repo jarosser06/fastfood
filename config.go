@@ -2,7 +2,6 @@ package fastfood
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 )
@@ -19,13 +18,13 @@ func NewConfig(path string) (Config, error) {
 
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
-		return c, errors.New(fmt.Sprintf("Error reading config %v", err))
+		return c, fmt.Errorf("Error reading config %v", err)
 	}
 
 	err = json.Unmarshal(file, &c)
 
 	if err != nil {
-		return c, errors.New(fmt.Sprintf("Error parsing json file %v", err))
+		return c, fmt.Errorf("Error parsing json file %v", err)
 	}
 
 	return c, nil
