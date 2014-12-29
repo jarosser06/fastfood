@@ -9,6 +9,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/jarosser06/fastfood/common/fileutil"
 )
 
 type OSTarget struct {
@@ -119,7 +121,7 @@ func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error 
 }
 
 func (c *Cookbook) GenDirs(cookbookDirs []string) error {
-	if !FileExist(c.Path) {
+	if !fileutil.FileExist(c.Path) {
 		err := os.Mkdir(c.Path, 0755)
 		if err != nil {
 			return fmt.Errorf("cookbook.Gendirs(): %v", err)
@@ -127,7 +129,7 @@ func (c *Cookbook) GenDirs(cookbookDirs []string) error {
 	}
 
 	for _, dir := range cookbookDirs {
-		if !FileExist(path.Join(c.Path, dir)) {
+		if !fileutil.FileExist(path.Join(c.Path, dir)) {
 			err := os.MkdirAll(path.Join(c.Path, dir), 0755)
 			if err != nil {
 				return fmt.Errorf("cookbook.Gendirs(): %v", err)
@@ -162,7 +164,7 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 
 		// Don't append newlines if all dependencies are up to date
 		if len(depBuffer) > 0 {
-			AppendFile(
+			fileutil.AppendFile(
 				path.Join(c.Path, "metadata.rb"),
 				fmt.Sprintf("%s\n", strings.Join(depBuffer, "\n")),
 			)

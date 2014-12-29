@@ -1,7 +1,6 @@
-package fastfood
+package fileutil
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -35,15 +34,7 @@ func FileExist(filePath string) bool {
 	}
 }
 
-func CapitalizeString(str string) string {
-	byteStr := []byte(str)
-	capletter := bytes.ToUpper([]byte{byteStr[0]})
-	byteStr[0] = capletter[0]
-
-	return string(byteStr)
-}
-
-func CopyFile(source string, dest string) error {
+func Copy(source string, dest string) error {
 	if FileExist(dest) {
 		return errors.New("file already exists")
 	} else {
