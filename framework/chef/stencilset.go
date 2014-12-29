@@ -1,4 +1,4 @@
-package fastfood
+package chef
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/jarosser06/fastfood"
 	"github.com/jarosser06/fastfood/common/fileutil"
 	"github.com/jarosser06/fastfood/common/stringutil"
 )
@@ -17,82 +18,80 @@ type Option struct {
 	Help         string `json:"help"`
 }
 
-type Provider struct {
-	Cookbook    Cookbook
-	DefaultType string            `json:"default_type"`
-	Deps        []string          `json:"dependencies"`
-	Opts        map[string]Option `json:"options"`
-	Types       map[string]struct {
+type StencilSet struct {
+	Cookbook       Cookbook
+	DefaultStencil string            `json:"default_stencil"`
+	Deps           []string          `json:"dependencies"`
+	Opts           map[string]Option `json:"options"`
+	Stencils       map[string]struct {
 		Deps        []string          `json:"dependencies"`
 		Directories []string          `json:"directories"`
 		Files       map[string]string `json:"files"`
 		Opts        map[string]Option `json:"options"`
 		Partials    []string          `json:"partials"`
-	}
+	} `json:"stencils"`
 }
 
 // Return a new provider, not extremley helpful atm
 // Takes a cookbook and path to the provider templates
-func NewProvider(ckbk Cookbook) Provider {
-	return Provider{
+func NewStencilSet(ckbk Cookbook) StencilSet {
+	return StencilSet{
 		Cookbook: ckbk,
 	}
 }
 
-//TODO: Return proper errors instead fo panicing
-func NewProviderFromFile(ckbk Cookbook, file string) (Provider, error) {
-	provider := NewProvider(ckbk)
+func NewStencilSetFromFile(ckbk Cookbook, file string) (StencilSet, error) {
+	sset := NewStencilSet(ckbk)
 
 	f, err := ioutil.ReadFile(file)
-	// Probably shouldn't Panic, might scare people
 	if err != nil {
-		return provider, fmt.Errorf("Failed to read file %s: %v", file, err)
+		return sset, fmt.Errorf("Failed to read file %s: %v", file, err)
 	}
 
-	err = json.Unmarshal(f, &provider)
+	err = json.Unmarshal(f, &sset)
 	if err != nil {
-		return provider, fmt.Errorf("Failed to unmarshal provider json: %v", err)
+		return sset, fmt.Errorf("Failed to unmarshal provider json: %v", err)
 	}
 
-	return provider, nil
+	return sset, nil
 }
 
 // Return true if the type exists in types
-func (p *Provider) ValidType(typeName string) bool {
-	_, ok := p.Types[typeName]
+func (s *StencilSet) ValidType(stencil string) bool {
+	_, ok := s.Stencils[stencil]
 	return ok
 }
 
 // Returns a string slice of dependencies
-func (p *Provider) Dependencies(typeName string) []string {
-	deps := p.Deps
-	deps = append(p.Types[typeName].Deps, deps...)
+func (s *StencilSet) Dependencies(stencil string) []string {
+	deps := s.Deps
+	deps = append(s.Stencils[stencil].Deps, deps...)
 
 	return deps
 }
 
 // Merge all of the options from a given map with the defaults from the
 // type and provider
-func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string]string {
+func (s *StencilSet) MergeOpts(stencil string, opts map[string]string) map[string]string {
 
 	// Merge type options first
 	// Gives the ability to override provider global options
-	for optName, optVal := range p.Types[typeName].Opts {
-		if _, ok := opts[optName]; !ok {
-			if val := optVal.DefaultValue; val != "" {
-				opts[optName] = optVal.DefaultValue
+	for name, val := range s.Stencils[stencil].Opts {
+		if _, ok := opts[name]; !ok {
+			if v := val.DefaultValue; v != "" {
+				opts[name] = val.DefaultValue
 			} else {
-				opts[optName] = ""
+				opts[name] = ""
 			}
 		}
 	}
 
-	for optName, optVal := range p.Opts {
-		if _, ok := opts[optName]; !ok {
-			if val := optVal.DefaultValue; val != "" {
-				opts[optName] = optVal.DefaultValue
+	for name, val := range s.Opts {
+		if _, ok := opts[name]; !ok {
+			if v := val.DefaultValue; v != "" {
+				opts[name] = val.DefaultValue
 			} else {
-				opts[optName] = ""
+				opts[name] = ""
 			}
 		}
 	}
@@ -101,28 +100,28 @@ func (p *Provider) MergeOpts(typeName string, opts map[string]string) map[string
 }
 
 // Creates the expected struct for all templates and renders each template one by one
-func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bool, opts map[string]string) error {
-	mergedOpts := p.MergeOpts(typeName, opts)
-	cappedMap := make(map[string]string)
+func (s *StencilSet) GenFiles(stencil string, templatesPath string, forceWrite bool, opts map[string]string) error {
+	mergedOpts := s.MergeOpts(stencil, opts)
+	cmap := make(map[string]string)
 	for key, val := range mergedOpts {
-		cappedMap[stringutil.CapitalizeString(key)] = val
+		cmap[stringutil.CapitalizeString(key)] = val
 	}
 
 	templateOpts := struct {
-		*Helpers
+		*fastfood.Helpers
 		Cookbook Cookbook
 		Options  map[string]string
 	}{
-		Cookbook: p.Cookbook,
-		Options:  cappedMap,
+		Cookbook: s.Cookbook,
+		Options:  cmap,
 	}
 
 	// TODO: Some of this could be cleaned up and added to the provider.Template
-	files := p.Types[typeName].Files
-	partials := p.Types[typeName].Partials
+	files := s.Stencils[stencil].Files
+	partials := s.Stencils[stencil].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		if fileutil.FileExist(path.Join(p.Cookbook.Path, cookbookFile)) && !forceWrite {
+		if fileutil.FileExist(path.Join(s.Cookbook.Path, cookbookFile)) && !forceWrite {
 			continue
 		}
 		var content []string
@@ -141,7 +140,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 			content = append(content, string(b))
 		}
 
-		t, err := NewTemplate(cookbookFile, templateOpts, content)
+		t, err := fastfood.NewTemplate(cookbookFile, templateOpts, content)
 
 		if err != nil {
 			return fmt.Errorf("Error creating template: %v", err)
@@ -149,7 +148,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 
 		t.CleanNewlines()
 
-		if err := t.Flush(path.Join(p.Cookbook.Path, cookbookFile)); err != nil {
+		if err := t.Flush(path.Join(s.Cookbook.Path, cookbookFile)); err != nil {
 			return fmt.Errorf("Error writing file: %v", err)
 		}
 	}
@@ -159,18 +158,18 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 // Generate any directories needed for the provider
 // Always make sure recipes and test/unit/spec are created
 // since they are the most common
-func (p *Provider) GenDirs(typeName string) error {
+func (s *StencilSet) GenDirs(stencil string) error {
 	dirs := append(
-		p.Types[typeName].Directories,
+		s.Stencils[stencil].Directories,
 		"recipes",
 		"test/unit/spec",
 	)
 
 	for _, dir := range dirs {
-		fullPath := path.Join(p.Cookbook.Path, dir)
+		fullPath := path.Join(s.Cookbook.Path, dir)
 
 		if !fileutil.FileExist(fullPath) {
-			err := os.MkdirAll(path.Join(p.Cookbook.Path, dir), 0755)
+			err := os.MkdirAll(path.Join(s.Cookbook.Path, dir), 0755)
 
 			if err != nil {
 				return fmt.Errorf("database.GenDirs(): %v", err)
@@ -182,9 +181,9 @@ func (p *Provider) GenDirs(typeName string) error {
 }
 
 // Print Provider help
-func (p *Provider) Help() string {
-	var globalOpts, providerTypes []string
-	for name, opt := range p.Opts {
+func (s *StencilSet) Help() string {
+	var globalOpts, stencils []string
+	for name, opt := range s.Opts {
 		var help string
 		if opt.Help == "" {
 			help = "NO HELP FOUND"
@@ -198,10 +197,10 @@ func (p *Provider) Help() string {
 		)
 	}
 
-	for providerType := range p.Types {
-		providerTypes = append(
-			providerTypes,
-			fmt.Sprintf("  %s", providerType),
+	for stencil := range s.Stencils {
+		stencils = append(
+			stencils,
+			fmt.Sprintf("  %s", stencil),
 		)
 	}
 	helpText := fmt.Sprintf(`
@@ -214,6 +213,6 @@ Global Options:
 Provider Types:
 
 %s
-`, p.DefaultType, strings.Join(globalOpts, "\n"), strings.Join(providerTypes, "\n"))
+`, s.DefaultStencil, strings.Join(globalOpts, "\n"), strings.Join(stencils, "\n"))
 	return helpText
 }

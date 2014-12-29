@@ -1,13 +1,13 @@
 {
   "name": "testcookbook",
-  "providers": [
+  "stencils": [
     {
       "name": "rabbitmq",
-      "provider": "rabbitmq"
+      "stencil": "rabbitmq"
     },
     {
       "name": "myapp",
-      "provider": "rails_app",
+      "stencil": "rails_app",
       "dbcredentials": "db_credentials",
       "owner": "rails"
     }

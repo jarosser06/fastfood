@@ -1,6 +1,7 @@
 {
   "id": "database",
-  "default_type": "mysql_master",
+  "ff_api": 1,
+  "default_stencil": "mysql_master",
   "dependencies": [
     "rackspace_iptables"
   ],
@@ -21,7 +22,7 @@
       "help": "A tag used to locate what nodes to open the firewall for"
     }
   },
-  "types": {
+  "stencils": {
     "mysql_master": {
       "dependencies": [
         "database",
