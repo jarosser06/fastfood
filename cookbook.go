@@ -102,6 +102,11 @@ func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error 
 	for _, cookbookFile := range cookbookFiles {
 		tempStr, err := ioutil.ReadFile(path.Join(templatesPath, cookbookFile))
 
+		// If the file exists continue
+		if fileutil.FileExist(cookbookFile) {
+			continue
+		}
+
 		if err != nil {
 			return fmt.Errorf("cookbook.GenFiles() reading template file: %v", err)
 		}
