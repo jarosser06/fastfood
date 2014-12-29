@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/jarosser06/fastfood"
+	"github.com/jarosser06/fastfood/common/fileutil"
 )
 
 const (
@@ -30,7 +31,7 @@ type ProviderMap map[string]fastfood.Provider
 // dynamic help options
 func (c *Common) LoadManifest() error {
 	baseManifest := path.Join(c.TemplatePack, "manifest.json")
-	if !fastfood.FileExist(baseManifest) {
+	if !fileutil.FileExist(baseManifest) {
 		return fmt.Errorf("Error no such file %s\n", baseManifest)
 	}
 

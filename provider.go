@@ -7,6 +7,9 @@ import (
 	"os"
 	"path"
 	"strings"
+
+	"github.com/jarosser06/fastfood/common/fileutil"
+	"github.com/jarosser06/fastfood/common/stringutil"
 )
 
 type Option struct {
@@ -102,7 +105,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 	mergedOpts := p.MergeOpts(typeName, opts)
 	cappedMap := make(map[string]string)
 	for key, val := range mergedOpts {
-		cappedMap[CapitalizeString(key)] = val
+		cappedMap[stringutil.CapitalizeString(key)] = val
 	}
 
 	templateOpts := struct {
@@ -119,7 +122,7 @@ func (p *Provider) GenFiles(typeName string, templatesPath string, forceWrite bo
 	partials := p.Types[typeName].Partials
 	for cookbookFile, templateFile := range files {
 		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		if FileExist(path.Join(p.Cookbook.Path, cookbookFile)) && !forceWrite {
+		if fileutil.FileExist(path.Join(p.Cookbook.Path, cookbookFile)) && !forceWrite {
 			continue
 		}
 		var content []string
@@ -166,7 +169,7 @@ func (p *Provider) GenDirs(typeName string) error {
 	for _, dir := range dirs {
 		fullPath := path.Join(p.Cookbook.Path, dir)
 
-		if !FileExist(fullPath) {
+		if !fileutil.FileExist(fullPath) {
 			err := os.MkdirAll(path.Join(p.Cookbook.Path, dir), 0755)
 
 			if err != nil {

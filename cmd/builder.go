@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/jarosser06/fastfood"
+	"github.com/jarosser06/fastfood/common/fileutil"
 )
 
 type Builder struct {
@@ -39,7 +40,7 @@ func (b *Builder) Run(args []string) int {
 	}
 
 	configFile := remainingArgs[0]
-	if !fastfood.FileExist(configFile) {
+	if !fileutil.FileExist(configFile) {
 		fmt.Printf("file does not exist %s", configFile)
 		return 1
 	}
@@ -74,7 +75,7 @@ func (b *Builder) Run(args []string) int {
 	}
 
 	// Copy the template file to the cookbook if it doesn't exist in the cookbook
-	err = fastfood.CopyFile(configFile, path.Join(cookbook.Path, "fastfood.json"))
+	err = fileutil.Copy(configFile, path.Join(cookbook.Path, "fastfood.json"))
 	if err != nil {
 		// if the file exists then thats fine
 		if err.Error() != "file already exists" {
