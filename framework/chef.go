@@ -38,9 +38,41 @@ func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
 
 // Generates a basic cookbook structure
 func (c *Chef) GenerateBase() ([]string, error) {
-	//TODO: Implement
+	// Generate the cookbook if it doesn't exist
+	if !fileutil.FileExist(c.cookbook.Path) {
+		err := os.Mkdir(c.cookbook.Path, 0755)
+		if err != nil {
+			return []string{}, fmt.Errorf(
+				"error creating cookbook directory %s: %v",
+				c.cookbook.Path,
+				err,
+			)
+		}
+	}
 
-	return []string{}, nil
+	err := c.genDirs(c.options.BaseDirs)
+	if err != nil {
+		return []string{}, err
+	}
+
+	var moddedFile []string
+	for _, file := range c.options.BaseFiles {
+		cfile := path.Join(c.cookbook.Path, file)
+		// If the file already exists then dont overwrite it
+		if fileutil.FileExist(cfile) {
+			continue
+		}
+
+		tfile := path.Join(c.options.TemplateDir, file)
+		err := c.genBaseFile(cfile, tfile)
+		if err != nil {
+			return moddedFile, err
+		}
+
+		moddedFile = append(moddedFile, cfile)
+	}
+
+	return moddedFile, nil
 }
 
 // Generates a stencil
@@ -124,6 +156,25 @@ func (c *Chef) genStencilFile(cfile string, tfile string, pContent []string, tOp
 	return nil
 }
 
+func (c *Chef) genBaseFile(file string, tfile string) error {
+	content, err := ioutil.ReadFile(tfile)
+	if err != nil {
+		return fmt.Errorf("error reading file %s, %v", file, err)
+	}
+
+	t, err := fastfood.NewTemplate(file, c.cookbook, []string{string(content)})
+	if err != nil {
+		return fmt.Errorf("error %v returned while creating new template %s", err, file)
+	}
+
+	t.CleanNewlines()
+	if err := t.Flush(file); err != nil {
+		return fmt.Errorf("error %v while writing file %s", err, file)
+	}
+
+	return nil
+}
+
 // Generates directories, meant for internal usage to Chef
 func (c *Chef) genDirs(dirs []string) error {
 	for _, dir := range dirs {
@@ -133,27 +184,6 @@ func (c *Chef) genDirs(dirs []string) error {
 			err := os.MkdirAll(fpath, 0755)
 			if err != nil {
 				return fmt.Errorf("error %v occured while creating directory %s", err, fpath)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (c *Chef) genStencilDirs(dirs []string) error {
-	dirs = append(
-		dirs,
-		"recipes",
-		"test/unit/spec",
-	)
-
-	for _, dir := range dirs {
-		fullPath := path.Join(c.cookbook.Path, dir)
-
-		if !fileutil.FileExist(fullPath) {
-			err := os.MkdirAll(path.Join(c.cookbook.Path, dir), 0755)
-			if err != nil {
-				return fmt.Errorf("database.GenDirs(): %v", err)
 			}
 		}
 	}

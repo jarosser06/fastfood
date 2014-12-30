@@ -6,6 +6,7 @@ type FrameworkOptions struct {
 	BaseDirs    []string
 	Force       bool
 	Name        string
+	TemplateDir string
 }
 
 type Framework interface {
@@ -14,6 +15,7 @@ type Framework interface {
 	Init(FrameworkOptions) error
 	// Generate Empty generates a new base directory and files for a framework
 	// it returns a slice of files that were modified and an error
+	// Takes an array of directories and an array of templates
 	GenerateBase() ([]string, error)
 	// Generate Stencil generates a stencil and returns a slice of
 	// files that were modified and an error

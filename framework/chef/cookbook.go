@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -96,54 +95,6 @@ func PathIsCookbook(cookbookPath string) bool {
 	} else {
 		return false
 	}
-}
-
-func (c *Cookbook) GenFiles(cookbookFiles []string, templatesPath string) error {
-
-	for _, cookbookFile := range cookbookFiles {
-		tempStr, err := ioutil.ReadFile(path.Join(templatesPath, cookbookFile))
-
-		// If the file exists continue
-		if fileutil.FileExist(cookbookFile) {
-			continue
-		}
-
-		if err != nil {
-			return fmt.Errorf("cookbook.GenFiles() reading template file: %v", err)
-		}
-
-		t, err := fastfood.NewTemplate(cookbookFile, c, []string{string(tempStr)})
-		if err != nil {
-			return fmt.Errorf("cookbook.GenFiles(): %v", err)
-		}
-
-		t.CleanNewlines()
-		if err := t.Flush(path.Join(c.Path, cookbookFile)); err != nil {
-			return fmt.Errorf("cookbook.GenFiles(): %v", err)
-		}
-	}
-
-	return nil
-}
-
-func (c *Cookbook) GenDirs(cookbookDirs []string) error {
-	if !fileutil.FileExist(c.Path) {
-		err := os.Mkdir(c.Path, 0755)
-		if err != nil {
-			return fmt.Errorf("cookbook.Gendirs(): %v", err)
-		}
-	}
-
-	for _, dir := range cookbookDirs {
-		if !fileutil.FileExist(path.Join(c.Path, dir)) {
-			err := os.MkdirAll(path.Join(c.Path, dir), 0755)
-			if err != nil {
-				return fmt.Errorf("cookbook.Gendirs(): %v", err)
-			}
-		}
-	}
-
-	return nil
 }
 
 // Returns a list of dependencies that were written
