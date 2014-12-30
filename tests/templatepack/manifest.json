@@ -1,37 +1,37 @@
 {
-  "providers": {
+  "api": 1,
+  "stencil_sets": {
     "database": {
       "name": "database",
-      "manifest": "database/manifest.json",
       "help": "Creates a database recipe based on the type, defaults to MySQL"
     },
     "application": {
       "name": "application",
-      "manifest": "application/manifest.json",
       "help": "Creates an application recipe based on the type, defaults to Generic"
     }
   },
-  "cookbook": {
-    "templates_path": "cookbook",
-    "files": [
-      "Berksfile",
-      "CHANGELOG.md",
-      "Gemfile",
-      "metadata.rb",
-      "README.md",
-      "recipes/default.rb",
-      "test/unit/spec/default_spec.rb",
-      "test/unit/spec/spec_helper.rb"
-    ],
-    "directories": [
-      "attributes",
-      "files",
-      "libraries",
-      "providers",
-      "recipes",
-      "resources",
-      "templates",
-      "test/unit/spec"
-    ]
+  "frameworks": {
+    "chef": {
+      "files": [
+        "Berksfile",
+        "CHANGELOG.md",
+        "Gemfile",
+        "metadata.rb",
+        "README.md",
+        "recipes/default.rb",
+        "test/unit/spec/default_spec.rb",
+        "test/unit/spec/spec_helper.rb"
+      ],
+      "directories": [
+        "attributes",
+        "files",
+        "libraries",
+        "providers",
+        "recipes",
+        "resources",
+        "templates",
+        "test/unit/spec"
+      ]
+    }
   }
 }

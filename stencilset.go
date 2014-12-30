@@ -1,11 +1,14 @@
+/*
+ * This handles everything to do with stencilsets and stencils for fastfood
+ */
 package fastfood
 
 import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/jarosser06/fastfood/common/fileutil"
@@ -20,7 +23,7 @@ type Option struct {
 
 type StencilSet struct {
 	Name           string                       `json:"id"`
-	APIVersion     int                          `json:"ff_api"`
+	APIVersion     int                          `json:"api"`
 	BerksDeps      map[string]map[string]string `json:"berks_dependencies"`
 	DefaultStencil string                       `json:"default_stencil"`
 	Deps           []string                     `json:"dependencies"`
@@ -55,15 +58,34 @@ func NewStencilSet(file string) (StencilSet, error) {
 		return sset, fmt.Errorf("unmarshalling stencil set %s return error %v", file, err)
 	}
 
+	// Calculate the actual paths to the templates
+	sset.calculatePaths(filepath.Dir(file))
 	return sset, nil
 }
 
+// Calculates full paths for stencil templates and partials
+// THIS IS CALLED BY THE NewStencilSet() function
+func (s *StencilSet) calculatePaths(basePath string) {
+	for name, stencil := range s.Stencils {
+		for file, temp := range stencil.Files {
+			stencil.Files[file] = path.Join(basePath, temp)
+		}
+
+		for i, partial := range stencil.Partials {
+			stencil.Partials[i] = path.Join(basePath, partial)
+		}
+
+		s.Stencils[name] = stencil
+	}
+
+}
+
 // Return true if the type exists in types
-func (s *StencilSet) Validate() (bool, error) {
+func (s *StencilSet) Valid() (bool, error) {
 	// Check if stencil version matches api version
 	if s.APIVersion != stencilAPI {
 		return false, fmt.Errorf(
-			"api version mismatch, version %i not compatible with %i",
+			"api version mismatch, version %d not compatible with %d",
 			s.APIVersion,
 			stencilAPI,
 		)
@@ -118,89 +140,6 @@ func (s *StencilSet) MergeOpts(stencil string, opts map[string]string) map[strin
 	}
 
 	return opts
-}
-
-// Creates the expected struct for all templates and renders each template one by one
-/*
-func (s *StencilSet) GenFiles(stencil string, templatesPath string, forceWrite bool, opts map[string]string) error {
-	mergedOpts := s.MergeOpts(stencil, opts)
-	cmap := make(map[string]string)
-	for key, val := range mergedOpts {
-		cmap[stringutil.CapitalizeString(key)] = val
-	}
-
-	templateOpts := struct {
-		*fastfood.Helpers
-		Cookbook Cookbook
-		Options  map[string]string
-	}{
-		Cookbook: s.Cookbook,
-		Options:  cmap,
-	}
-
-	// TODO: Some of this could be cleaned up and added to the provider.Template
-	files := s.Stencils[stencil].Files
-	partials := s.Stencils[stencil].Partials
-	for cookbookFile, templateFile := range files {
-		cookbookFile = strings.Replace(cookbookFile, "<NAME>", templateOpts.Options["Name"], 1)
-		if fileutil.FileExist(path.Join(s.Cookbook.Path, cookbookFile)) && !forceWrite {
-			continue
-		}
-		var content []string
-		b, err := ioutil.ReadFile(path.Join(templatesPath, templateFile))
-		if err != nil {
-			return fmt.Errorf("provider.GenFiles() reading file returned %v", err)
-		}
-
-		content = append(content, string(b))
-		for _, partial := range partials {
-			b, err := ioutil.ReadFile(path.Join(templatesPath, partial))
-			if err != nil {
-				return fmt.Errorf("provider.GenFiles() reading file returned %v", err)
-			}
-
-			content = append(content, string(b))
-		}
-
-		t, err := fastfood.NewTemplate(cookbookFile, templateOpts, content)
-
-		if err != nil {
-			return fmt.Errorf("Error creating template: %v", err)
-		}
-
-		t.CleanNewlines()
-
-		if err := t.Flush(path.Join(s.Cookbook.Path, cookbookFile)); err != nil {
-			return fmt.Errorf("Error writing file: %v", err)
-		}
-	}
-	return nil
-}
-*/
-
-// Generate any directories needed for the provider
-// Always make sure recipes and test/unit/spec are created
-// since they are the most common
-func (s *StencilSet) GenDirs(basePath string, stencil string) error {
-	dirs := append(
-		s.Stencils[stencil].Directories,
-		"recipes",
-		"test/unit/spec",
-	)
-
-	for _, dir := range dirs {
-		fullPath := path.Join(basePath, dir)
-
-		if !fileutil.FileExist(fullPath) {
-			err := os.MkdirAll(path.Join(basePath, dir), 0755)
-
-			if err != nil {
-				return fmt.Errorf("database.GenDirs(): %v", err)
-			}
-		}
-	}
-
-	return nil
 }
 
 // Print Provider help

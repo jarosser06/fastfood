@@ -1,6 +1,6 @@
 {
   "id": "database",
-  "ff_api": 1,
+  "api": 1,
   "default_stencil": "mysql_master",
   "dependencies": [
     "rackspace_iptables"

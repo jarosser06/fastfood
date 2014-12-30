@@ -24,16 +24,6 @@ func AppendFile(file string, text string) error {
 	return nil
 }
 
-func FileExist(filePath string) bool {
-	_, err := os.Stat(filePath)
-
-	if err == nil {
-		return true
-	} else {
-		return false
-	}
-}
-
 func Copy(source string, dest string) error {
 	if FileExist(dest) {
 		return errors.New("file already exists")
@@ -49,5 +39,15 @@ func Copy(source string, dest string) error {
 		}
 
 		return nil
+	}
+}
+
+func FileExist(filePath string) bool {
+	_, err := os.Stat(filePath)
+
+	if err == nil {
+		return true
+	} else {
+		return false
 	}
 }

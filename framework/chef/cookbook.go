@@ -29,14 +29,13 @@ type Cookbook struct {
 	Year         int
 }
 
+// Returns a new empty cookbook
 func NewCookbook(cookbookPath string, name string) Cookbook {
-	cookbook := Cookbook{
+	return Cookbook{
 		Year: time.Now().Year(),
-		Path: path.Join(cookbookPath, name),
+		Path: cookbookPath,
 		Name: name,
 	}
-
-	return cookbook
 }
 
 // Given a cookbook path, return a cookbook struct pre-populated
@@ -52,6 +51,7 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 
 		defer f.Close()
 
+		// TODO: This should be cleaned up and stuck elsewhere
 		scanner := bufio.NewScanner(f)
 		scanner.Split(bufio.ScanWords)
 
