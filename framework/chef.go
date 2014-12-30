@@ -122,6 +122,7 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 
 		moddedFiles = append(moddedFiles, cfile)
 	}
+	c.cookbook.AppendDependencies(stencilset.Dependencies(name))
 
 	return moddedFiles, nil
 }

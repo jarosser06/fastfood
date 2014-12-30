@@ -128,5 +128,8 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 		}
 	}
 
+	// Add the new dependencies to the cookbook interface
+	c.Dependencies = append(c.Dependencies, newDeps...)
+
 	return newDeps
 }
