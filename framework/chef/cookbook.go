@@ -32,7 +32,7 @@ type Cookbook struct {
 func NewCookbook(cookbookPath string, name string) Cookbook {
 	return Cookbook{
 		Year: time.Now().Year(),
-		Path: cookbookPath,
+		Path: path.Join(cookbookPath, name),
 		Name: name,
 	}
 }

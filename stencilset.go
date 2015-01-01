@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -22,19 +21,15 @@ type Option struct {
 }
 
 type StencilSet struct {
-	Name           string                       `json:"id"`
-	APIVersion     int                          `json:"api"`
-	BerksDeps      map[string]map[string]string `json:"berks_dependencies"`
-	DefaultStencil string                       `json:"default_stencil"`
-	Deps           []string                     `json:"dependencies"`
-	Opts           map[string]Option            `json:"options"`
+	Name           string `json:"id"`
+	APIVersion     int    `json:"api"`
+	BasePath       string
+	DefaultStencil string            `json:"default_stencil"`
+	Frameworks     map[string]string `json:"frameworks"`
+	Opts           map[string]Option `json:"options"`
 	Stencils       map[string]struct {
-		BerksDeps   map[string]map[string]string `json:"berks_dependencies"`
-		Deps        []string                     `json:"dependencies"`
-		Directories []string                     `json:"directories"`
-		Files       map[string]string            `json:"files"`
-		Opts        map[string]Option            `json:"options"`
-		Partials    []string                     `json:"partials"`
+		Frameworks map[string]string `json:"frameworks"`
+		Opts       map[string]Option `json:"options"`
 	} `json:"stencils"`
 }
 
@@ -59,25 +54,8 @@ func NewStencilSet(file string) (StencilSet, error) {
 	}
 
 	// Calculate the actual paths to the templates
-	sset.calculatePaths(filepath.Dir(file))
+	sset.BasePath = filepath.Dir(file)
 	return sset, nil
-}
-
-// Calculates full paths for stencil templates and partials
-// THIS IS CALLED BY THE NewStencilSet() function
-func (s *StencilSet) calculatePaths(basePath string) {
-	for name, stencil := range s.Stencils {
-		for file, temp := range stencil.Files {
-			stencil.Files[file] = path.Join(basePath, temp)
-		}
-
-		for i, partial := range stencil.Partials {
-			stencil.Partials[i] = path.Join(basePath, partial)
-		}
-
-		s.Stencils[name] = stencil
-	}
-
 }
 
 // Return true if the type exists in types
@@ -103,14 +81,6 @@ func (s *StencilSet) Valid() (bool, error) {
 	} else {
 		return false, fmt.Errorf("default stencil %s is not a valid stencil")
 	}
-}
-
-// Returns a string slice of dependencies
-func (s *StencilSet) Dependencies(stencil string) []string {
-	deps := s.Deps
-	deps = append(s.Stencils[stencil].Deps, deps...)
-
-	return deps
 }
 
 // Merge all of the options from a given map with the defaults from the

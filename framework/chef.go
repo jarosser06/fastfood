@@ -20,6 +20,7 @@ type Chef struct {
 
 // Initializes a framework with options
 func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
+	c.options = frameworkOptions
 	cpath := path.Join(c.options.Destination, c.options.Name)
 
 	// Create cookbook
@@ -79,8 +80,11 @@ func (c *Chef) GenerateBase() ([]string, error) {
 // Takes the stencil name to be generated
 func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts map[string]string) ([]string, error) {
 	var moddedFiles []string
-	stencil := stencilset.Stencils[name]
 	opts = stencilset.MergeOpts(name, opts)
+	chefOpts, err := c.chefOpts(name, stencilset)
+	if err != nil {
+		return moddedFiles, err
+	}
 
 	tOpts := struct {
 		*fastfood.Helpers
@@ -92,19 +96,20 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 	}
 
 	// Generate the directories
-	c.genDirs(append(stencil.Directories))
+	c.genDirs(append(chefOpts.Directories))
 
 	// Generate the files
-	files := stencil.Files
-	pfiles := stencil.Partials
+	files := chefOpts.Files
+	pfiles := chefOpts.Partials
 
 	for cfile, tfile := range files {
 		// Find any instance of <NAME> and replace with the name
 		cfile = strings.Replace(cfile, "<NAME>", tOpts.Options["Name"], 1)
+		tfile = path.Join(stencilset.BasePath, tfile)
 
 		var pContent []string
 		for _, partial := range pfiles {
-			b, err := ioutil.ReadFile(partial)
+			b, err := ioutil.ReadFile(path.Join(stencilset.BasePath, partial))
 			if err != nil {
 				return moddedFiles, fmt.Errorf("error %v occured while reading file %s", err, partial)
 			}
@@ -122,9 +127,23 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 
 		moddedFiles = append(moddedFiles, cfile)
 	}
-	c.cookbook.AppendDependencies(stencilset.Dependencies(name))
+	c.cookbook.AppendDependencies(chefOpts.Dependencies)
 
 	return moddedFiles, nil
+}
+
+func (c *Chef) chefOpts(name string, s fastfood.StencilSet) (chef.Options, error) {
+	g, err := chef.NewOptions(s.Frameworks["chef"])
+	if err != nil {
+		return g, fmt.Errorf("error %v occured while getting stencil set chef options", err)
+	}
+
+	l, err := chef.NewOptions(s.Stencils[name].Frameworks["chef"])
+	if err != nil {
+		return l, fmt.Errorf("error %v occurred while getting stencil chef options", err)
+	}
+
+	return chef.Merge(g, l), nil
 }
 
 // Generates a stencil file, meant to be called by Chef interface
