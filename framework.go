@@ -21,8 +21,4 @@ type Framework interface {
 	// files that were modified and an error
 	// Accepts a stencil name, a stencilset and options
 	GenerateStencil(string, StencilSet, map[string]string) ([]string, error)
-
-	StencilSetOptions() interface{}
-
-	StencilOptions() interface{}
 }
