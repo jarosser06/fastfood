@@ -14,6 +14,7 @@ const templatePackAPI = 1
 
 type Manifest struct {
 	API         int `json:"api"`
+	Framework   string
 	Path        string
 	StencilSets map[string]struct {
 		Name          string
@@ -22,10 +23,9 @@ type Manifest struct {
 		templatesPath string
 	} `json:"stencil_sets"`
 
-	Frameworks map[string]struct {
-		Name            string
-		BaseFiles       []string `json:"files"`
-		BaseDirectories []string `json:"directories"`
+	Base struct {
+		Files       []string `json:"files"`
+		Directories []string `json:"directories"`
 	}
 }
 
@@ -54,13 +54,6 @@ func NewManifest(mpath string) (Manifest, error) {
 			"manifest.json",
 		)
 		m.StencilSets[n] = tmp
-	}
-
-	// Set name for frameworks
-	for n, _ := range m.Frameworks {
-		tmp := m.Frameworks[n]
-		tmp.Name = n
-		m.Frameworks[n] = tmp
 	}
 
 	return m, nil

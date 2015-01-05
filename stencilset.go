@@ -25,13 +25,17 @@ type StencilSet struct {
 	Name           string `json:"id"`
 	APIVersion     int    `json:"api"`
 	BasePath       string
-	DefaultStencil string                     `json:"default_stencil"`
-	Frameworks     map[string]json.RawMessage `json:"frameworks"`
-	Opts           map[string]Option          `json:"options"`
+	DefaultStencil string `json:"default_stencil"`
+	Raw            json.RawMessage
+	Opts           map[string]Option `json:"options"`
 	Stencils       map[string]struct {
-		Frameworks map[string]json.RawMessage `json:"frameworks"`
-		Opts       map[string]Option          `json:"options"`
+		Raw  json.RawMessage
+		Opts map[string]Option `json:"options"`
 	} `json:"stencils"`
+}
+
+type RawStencilSet struct {
+	Stencils map[string]json.RawMessage
 }
 
 // Return a new stencil set and error
@@ -48,10 +52,32 @@ func NewStencilSet(file string) (StencilSet, error) {
 		return sset, fmt.Errorf("reading file %s returned error %v", file, err)
 	}
 
-	// TODO: replace with override unmarshal that provides better errors
-	err = ffjson.Unmarshal(f, &sset)
+	// Pull out the raw data to store for later
+	var raw json.RawMessage
+	err = ffjson.Unmarshal(f, &raw)
 	if err != nil {
 		return sset, fmt.Errorf("unmarshalling stencil set %s return error %v", file, err)
+	}
+
+	// Pull out the raw stencil data to store for later
+	rawStencils := struct {
+		Stencils map[string]json.RawMessage
+	}{}
+
+	ffjson.Unmarshal(f, &rawStencils)
+
+	// Unmarshal the structure we currently know about
+	ffjson.Unmarshal(raw, &sset)
+	if err != nil {
+		return sset, fmt.Errorf("unmarshalling stencil set %s return error %v", file, err)
+	}
+
+	// Set the Raw
+	sset.Raw = raw
+	for n, _ := range sset.Stencils {
+		tmp := sset.Stencils[n]
+		tmp.Raw = rawStencils.Stencils[n]
+		sset.Stencils[n] = tmp
 	}
 
 	// Calculate the actual paths to the templates

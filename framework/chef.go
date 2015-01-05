@@ -60,8 +60,6 @@ func (c *Chef) GenerateBase() ([]string, error) {
 		}
 	}
 
-	fmt.Println(c.options.BaseDirs)
-	fmt.Println(c.options.BaseFiles)
 	err := c.genDirs(c.options.BaseDirs)
 	if err != nil {
 		return []string{}, err
@@ -144,12 +142,12 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 }
 
 func (c *Chef) chefOpts(name string, s fastfood.StencilSet) (chef.Options, error) {
-	g, err := chef.NewOptions(s.Frameworks["chef"])
+	g, err := chef.NewOptions(s.Raw)
 	if err != nil {
 		return g, err
 	}
 
-	l, err := chef.NewOptions(s.Stencils[name].Frameworks["chef"])
+	l, err := chef.NewOptions(s.Stencils[name].Raw)
 	if err != nil {
 		return l, err
 	}
@@ -208,9 +206,7 @@ func (c *Chef) genBaseFile(file string, tfile string) error {
 
 // Generates directories, meant for internal usage to Chef
 func (c *Chef) genDirs(dirs []string) error {
-	fmt.Println(dirs)
 	for _, dir := range dirs {
-		fmt.Println(dir)
 		fpath := path.Join(c.cookbook.Path, dir)
 
 		if !fileutil.FileExist(fpath) {

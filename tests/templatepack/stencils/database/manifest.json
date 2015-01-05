@@ -2,13 +2,12 @@
   "id": "database",
   "api": 1,
   "default_stencil": "mysql_master",
-  "frameworks": {
-    "chef": {
-      "dependencies": [
-        "rackspace_iptables"
-      ]
-    }
+  "berks_dependencies": {
+    "database": {}
   },
+  "dependencies": [
+    "rackspace_iptables"
+  ],
   "options": {
     "name": {
       "help": "name of the recipe and corresponding test file"
@@ -31,17 +30,13 @@
   },
   "stencils": {
     "mysql_master": {
-      "frameworks": {
-        "chef": {
-          "dependencies": [
-            "database",
-            "mysql-multi"
-          ],
-          "files": {
-            "recipes/<NAME>.rb": "recipes/mysql_master.rb",
-            "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
-          }
-        }
+      "dependencies": [
+        "database",
+        "mysql-multi"
+      ],
+      "files": {
+        "recipes/<NAME>.rb": "recipes/mysql_master.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
       },
       "options": {
         "name": {
@@ -50,16 +45,12 @@
       }
     },
     "mysql_slave": {
-      "frameworks": {
-        "chef": {
-          "dependencies": [
-            "mysql-multi"
-          ],
-          "files": {
-            "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
-            "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
-          }
-        }
+      "dependencies": [
+        "mysql-multi"
+      ],
+      "files": {
+        "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
+        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
       },
       "options": {
         "name": {

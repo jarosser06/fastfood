@@ -26,7 +26,7 @@ func TestNewManifest(t *testing.T) {
 		t.Errorf("Expected one of the parsed commands to match the name 'db'")
 	}
 
-	if len(manifest.Frameworks) == 0 {
+	if len(manifest.Base.Files) == 0 {
 		t.Errorf("Expected more than 0 cookbook files")
 	}
 }
