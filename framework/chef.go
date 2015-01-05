@@ -73,7 +73,7 @@ func (c *Chef) GenerateBase() ([]string, error) {
 			continue
 		}
 
-		tfile := path.Join(c.options.TemplateDir, file)
+		tfile := path.Join(c.options.TemplateDir, "base", file)
 		err := c.genBaseFile(cfile, tfile)
 		if err != nil {
 			return moddedFile, err
@@ -132,6 +132,8 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 			if err.Error() != "file exists" {
 				return moddedFiles, err
 			}
+			// File wasn't created moving on
+			continue
 		}
 
 		moddedFiles = append(moddedFiles, cfile)

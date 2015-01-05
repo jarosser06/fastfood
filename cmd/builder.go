@@ -51,8 +51,8 @@ func (b *Builder) Run(args []string) int {
 
 	fopts := fastfood.FrameworkOptions{
 		Destination: cookbookPath,
-		BaseFiles:   manifest.Frameworks["chef"].BaseFiles,
-		BaseDirs:    manifest.Frameworks["chef"].BaseDirectories,
+		BaseFiles:   manifest.Base.Files,
+		BaseDirs:    manifest.Base.Directories,
 		Force:       false,
 		Name:        config.Name,
 		TemplateDir: templatePack,
@@ -81,7 +81,7 @@ func (b *Builder) Run(args []string) int {
 	// Generate Stencils
 	for _, setConfig := range config.Stencils {
 		// TODO: Validate config
-		setName, ok := setConfig["name"]
+		setName, ok := setConfig["stencil_set"]
 		if !ok {
 			fmt.Printf("missing stencilset name in config file")
 			return 1
@@ -96,9 +96,9 @@ func (b *Builder) Run(args []string) int {
 			fmt.Printf("invalid stencilset %s %v", setName, err)
 		}
 
-		// Determine provider type
+		// Determine stencil
 		var stencil string
-		if val, ok := setConfig["stencil_set"]; ok {
+		if val, ok := setConfig["stencil"]; ok {
 			stencil = val
 		} else {
 			stencil = sset.DefaultStencil

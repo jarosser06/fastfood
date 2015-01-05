@@ -90,7 +90,7 @@ func (s *StencilSet) Valid() (bool, error) {
 	// Check if stencil version matches api version
 	if s.APIVersion != stencilAPI {
 		return false, fmt.Errorf(
-			"api version mismatch, version %d not compatible with %d",
+			"api version mismatch, version %d not compatible with %d\n",
 			s.APIVersion,
 			stencilAPI,
 		)
@@ -169,7 +169,7 @@ Global Options:
 
 %s
 
-Provider Types:
+Stencils:
 
 %s
 `, s.DefaultStencil, strings.Join(globalOpts, "\n"), strings.Join(stencils, "\n"))

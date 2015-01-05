@@ -31,7 +31,7 @@ var fopts = fastfood.FrameworkOptions{
 		"test/unit/spec",
 	},
 	Name:        "testcookbook",
-	TemplateDir: "../tests/templatepack/frameworks/chef",
+	TemplateDir: "../tests/templatepack",
 }
 
 func TestChefInit(t *testing.T) {

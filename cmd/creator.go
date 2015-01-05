@@ -35,35 +35,35 @@ func (c *Creator) Run(args []string) int {
 	}
 
 	remainingArgs := cmdFlags.Args()
-	if len(remainingArgs) > 0 {
-		name := remainingArgs[0]
-
-		manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
-		if err != nil {
-			fmt.Println(err)
-			return 1
-		}
-
-		fopts := fastfood.FrameworkOptions{
-			Destination: cookbooksPath,
-			BaseFiles:   manifest.Frameworks["chef"].BaseFiles,
-			BaseDirs:    manifest.Frameworks["chef"].BaseDirectories,
-			Name:        name,
-			TemplateDir: templatePack,
-		}
-
-		c := framework.Chef{}
-		c.Init(fopts)
-		_, err = c.GenerateBase()
-		if err != nil {
-			fmt.Println(err)
-			return 1
-		}
-
-	} else {
+	if len(remainingArgs) <= 0 {
 		fmt.Println("You must enter the name of the cookbook")
 		return 1
 	}
+	name := remainingArgs[0]
+
+	manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
+	if err != nil {
+		fmt.Println(err)
+		return 1
+	}
+
+	fopts := fastfood.FrameworkOptions{
+		Destination: cookbooksPath,
+		BaseFiles:   manifest.Base.Files,
+		BaseDirs:    manifest.Base.Directories,
+		Name:        name,
+		TemplateDir: templatePack,
+	}
+
+	chef := framework.Chef{}
+	chef.Init(fopts)
+	_, err = chef.GenerateBase()
+	if err != nil {
+		fmt.Println(err)
+		return 1
+	}
+
+	fmt.Println("cookbook %s created", name)
 	return 0
 }
 

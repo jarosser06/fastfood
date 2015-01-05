@@ -80,6 +80,7 @@ CMDFound:
 
 	if _, err := s.Valid(); err != nil {
 		fmt.Printf("invalid stencilset %v", err)
+		return 1
 	}
 
 	// No point in setting up a whole flag set here
