@@ -6,10 +6,10 @@ import (
 	"path"
 
 	"github.com/jarosser06/fastfood"
+	"github.com/jarosser06/fastfood/framework"
 )
 
 type Creator struct {
-	Common
 }
 
 func (c *Creator) Help() string {
@@ -23,9 +23,9 @@ Flags:
 }
 
 func (c *Creator) Run(args []string) int {
-	var cookbooksPath string
+	var cookbooksPath, templatePack string
 	cmdFlags := flag.NewFlagSet("new", flag.ContinueOnError)
-	cmdFlags.StringVar(&c.TemplatePack, "template-pack", DefaultTempPack(), "path to the template pack")
+	cmdFlags.StringVar(&templatePack, "template-pack", DefaultTempPack(), "path to the template pack")
 	cmdFlags.StringVar(&cookbooksPath, "cookbooks-path", DefaultCookbooksPath(), "base cookbooks directory")
 	cmdFlags.Usage = func() { fmt.Println(c.Help()) }
 
@@ -34,23 +34,28 @@ func (c *Creator) Run(args []string) int {
 		return 1
 	}
 
-	if err := c.LoadManifest(); err != nil {
-		fmt.Println(err)
-		return 1
-	}
-
 	remainingArgs := cmdFlags.Args()
 	if len(remainingArgs) > 0 {
-		cookbook := fastfood.NewCookbook(cookbooksPath, remainingArgs[0])
+		name := remainingArgs[0]
 
-		//TODO: These can be collapsed into a single function
-		if err := cookbook.GenDirs(c.Manifest.Cookbook.Directories); err != nil {
+		manifest, err := fastfood.NewManifest(path.Join(templatePack, "manifest.json"))
+		if err != nil {
 			fmt.Println(err)
 			return 1
 		}
 
-		templatePath := path.Join(c.TemplatePack, c.Manifest.Cookbook.TemplatesPath)
-		if err := cookbook.GenFiles(c.Manifest.Cookbook.Files, templatePath); err != nil {
+		fopts := fastfood.FrameworkOptions{
+			Destination: cookbooksPath,
+			BaseFiles:   manifest.Frameworks["chef"].BaseFiles,
+			BaseDirs:    manifest.Frameworks["chef"].BaseDirectories,
+			Name:        name,
+			TemplateDir: templatePack,
+		}
+
+		c := framework.Chef{}
+		c.Init(fopts)
+		_, err = c.GenerateBase()
+		if err != nil {
 			fmt.Println(err)
 			return 1
 		}

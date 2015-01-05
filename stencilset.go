@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/jarosser06/fastfood/common/fileutil"
+	ffjson "github.com/jarosser06/fastfood/common/json"
 )
 
 const stencilAPI = 1
@@ -24,12 +25,12 @@ type StencilSet struct {
 	Name           string `json:"id"`
 	APIVersion     int    `json:"api"`
 	BasePath       string
-	DefaultStencil string            `json:"default_stencil"`
-	Frameworks     map[string]string `json:"frameworks"`
-	Opts           map[string]Option `json:"options"`
+	DefaultStencil string                     `json:"default_stencil"`
+	Frameworks     map[string]json.RawMessage `json:"frameworks"`
+	Opts           map[string]Option          `json:"options"`
 	Stencils       map[string]struct {
-		Frameworks map[string]string `json:"frameworks"`
-		Opts       map[string]Option `json:"options"`
+		Frameworks map[string]json.RawMessage `json:"frameworks"`
+		Opts       map[string]Option          `json:"options"`
 	} `json:"stencils"`
 }
 
@@ -48,7 +49,7 @@ func NewStencilSet(file string) (StencilSet, error) {
 	}
 
 	// TODO: replace with override unmarshal that provides better errors
-	err = json.Unmarshal(f, &sset)
+	err = ffjson.Unmarshal(f, &sset)
 	if err != nil {
 		return sset, fmt.Errorf("unmarshalling stencil set %s return error %v", file, err)
 	}

@@ -1,12 +1,13 @@
 package fastfood
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/jarosser06/fastfood/common/json"
 )
 
 const templatePackAPI = 1

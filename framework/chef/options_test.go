@@ -34,7 +34,7 @@ var globalOptions = `
 }`
 
 func TestNewOptions(t *testing.T) {
-	o, err := NewOptions(localOptions)
+	o, err := NewOptions([]byte(localOptions))
 
 	if err != nil {
 		t.Errorf("unexpected error %v", err)
@@ -50,8 +50,8 @@ func TestNewOptions(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	l, _ := NewOptions(localOptions)
-	g, _ := NewOptions(globalOptions)
+	l, _ := NewOptions([]byte(localOptions))
+	g, _ := NewOptions([]byte(globalOptions))
 
 	merged := Merge(g, l)
 

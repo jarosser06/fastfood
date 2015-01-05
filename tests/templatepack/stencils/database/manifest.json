@@ -2,10 +2,17 @@
   "id": "database",
   "api": 1,
   "default_stencil": "mysql_master",
-  "dependencies": [
-    "rackspace_iptables"
-  ],
+  "frameworks": {
+    "chef": {
+      "dependencies": [
+        "rackspace_iptables"
+      ]
+    }
+  },
   "options": {
+    "name": {
+      "help": "name of the recipe and corresponding test file"
+    },
     "database": {
       "help": "the name of the database to create"
     },
@@ -24,13 +31,17 @@
   },
   "stencils": {
     "mysql_master": {
-      "dependencies": [
-        "database",
-        "mysql-multi"
-      ],
-      "files": {
-        "recipes/<NAME>.rb": "recipes/mysql_master.rb",
-        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
+      "frameworks": {
+        "chef": {
+          "dependencies": [
+            "database",
+            "mysql-multi"
+          ],
+          "files": {
+            "recipes/<NAME>.rb": "recipes/mysql_master.rb",
+            "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
+          }
+        }
       },
       "options": {
         "name": {
@@ -39,31 +50,20 @@
       }
     },
     "mysql_slave": {
-      "dependencies": [
-        "mysql-multi"
-      ],
-      "files": {
-        "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
-        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
+      "frameworks": {
+        "chef": {
+          "dependencies": [
+            "mysql-multi"
+          ],
+          "files": {
+            "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
+            "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"
+          }
+        }
       },
       "options": {
         "name": {
           "default": "mysql_slave"
-        }
-      }
-    },
-    "postgres_master": {
-      "dependencies": [
-        "pg-multi",
-        "database"
-      ],
-      "files": {
-        "recipes/<NAME>.rb": "recipes/postgres_master.rb",
-        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/postgres_master_spec.rb"
-      },
-      "options": {
-        "name": {
-          "default": "postgres_master"
         }
       }
     }

@@ -21,8 +21,17 @@ type Chef struct {
 // Initializes a framework with options
 func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
 	c.options = frameworkOptions
-	cpath := path.Join(c.options.Destination, c.options.Name)
+	if chef.PathIsCookbook(c.options.Destination) {
+		var err error
+		c.cookbook, err = chef.NewCookbookFromPath(c.options.Destination)
+		if err != nil {
+			return err
+		}
 
+		return nil
+	}
+
+	cpath := path.Join(c.options.Destination, c.options.Name)
 	// Create cookbook
 	if fileutil.FileExist(cpath) {
 		var err error
@@ -31,7 +40,7 @@ func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
 			return err
 		}
 	} else {
-		c.cookbook = chef.NewCookbook(cpath, c.options.Name)
+		c.cookbook = chef.NewCookbook(c.options.Destination, c.options.Name)
 	}
 
 	return nil
@@ -51,6 +60,8 @@ func (c *Chef) GenerateBase() ([]string, error) {
 		}
 	}
 
+	fmt.Println(c.options.BaseDirs)
+	fmt.Println(c.options.BaseFiles)
 	err := c.genDirs(c.options.BaseDirs)
 	if err != nil {
 		return []string{}, err
@@ -135,12 +146,12 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 func (c *Chef) chefOpts(name string, s fastfood.StencilSet) (chef.Options, error) {
 	g, err := chef.NewOptions(s.Frameworks["chef"])
 	if err != nil {
-		return g, fmt.Errorf("error %v occured while getting stencil set chef options", err)
+		return g, err
 	}
 
 	l, err := chef.NewOptions(s.Stencils[name].Frameworks["chef"])
 	if err != nil {
-		return l, fmt.Errorf("error %v occurred while getting stencil chef options", err)
+		return l, err
 	}
 
 	return chef.Merge(g, l), nil
@@ -179,7 +190,7 @@ func (c *Chef) genStencilFile(cfile string, tfile string, pContent []string, tOp
 func (c *Chef) genBaseFile(file string, tfile string) error {
 	content, err := ioutil.ReadFile(tfile)
 	if err != nil {
-		return fmt.Errorf("error reading file %s, %v", file, err)
+		return fmt.Errorf("error reading file %s, %v", tfile, err)
 	}
 
 	t, err := fastfood.NewTemplate(file, c.cookbook, []string{string(content)})
@@ -197,7 +208,9 @@ func (c *Chef) genBaseFile(file string, tfile string) error {
 
 // Generates directories, meant for internal usage to Chef
 func (c *Chef) genDirs(dirs []string) error {
+	fmt.Println(dirs)
 	for _, dir := range dirs {
+		fmt.Println(dir)
 		fpath := path.Join(c.cookbook.Path, dir)
 
 		if !fileutil.FileExist(fpath) {

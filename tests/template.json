@@ -3,11 +3,12 @@
   "stencils": [
     {
       "name": "rabbitmq",
-      "stencil": "rabbitmq"
+      "stencil_set": "rabbitmq"
     },
     {
       "name": "myapp",
-      "stencil": "rails_app",
+      "stencil_set": "rails_app",
+      "stencil": "nginx",
       "dbcredentials": "db_credentials",
       "owner": "rails"
     }

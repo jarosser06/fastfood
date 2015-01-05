@@ -1,9 +1,9 @@
 package chef
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/jarosser06/fastfood/common/json"
 	"github.com/jarosser06/fastfood/common/maputil"
 )
 
@@ -40,11 +40,11 @@ func Merge(global Options, local Options) Options {
 }
 
 // Given the framework information create the framework stencil
-func NewOptions(conf string) (Options, error) {
+func NewOptions(conf []byte) (Options, error) {
 	newOptions := Options{}
-	err := json.Unmarshal([]byte(conf), &newOptions)
+	err := json.Unmarshal(conf, &newOptions)
 	if err != nil {
-		return newOptions, fmt.Errorf("error parsing json %v", err)
+		return newOptions, fmt.Errorf("parsing json %v", err)
 	}
 
 	if newOptions.Files == nil {
