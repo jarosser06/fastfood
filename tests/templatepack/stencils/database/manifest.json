@@ -1,10 +1,17 @@
 {
   "id": "database",
-  "default_type": "mysql_master",
+  "api": 1,
+  "default_stencil": "mysql_master",
+  "berks_dependencies": {
+    "database": {}
+  },
   "dependencies": [
     "rackspace_iptables"
   ],
   "options": {
+    "name": {
+      "help": "name of the recipe and corresponding test file"
+    },
     "database": {
       "help": "the name of the database to create"
     },
@@ -21,7 +28,7 @@
       "help": "A tag used to locate what nodes to open the firewall for"
     }
   },
-  "types": {
+  "stencils": {
     "mysql_master": {
       "dependencies": [
         "database",
@@ -48,21 +55,6 @@
       "options": {
         "name": {
           "default": "mysql_slave"
-        }
-      }
-    },
-    "postgres_master": {
-      "dependencies": [
-        "pg-multi",
-        "database"
-      ],
-      "files": {
-        "recipes/<NAME>.rb": "recipes/postgres_master.rb",
-        "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/postgres_master_spec.rb"
-      },
-      "options": {
-        "name": {
-          "default": "postgres_master"
         }
       }
     }

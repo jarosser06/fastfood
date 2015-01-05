@@ -7,10 +7,10 @@ import (
 )
 
 type Config struct {
-	CookbookPath string              `json:"cookbook_path,omitempty"`
-	Name         string              `json:"name,omitempty"`
-	Providers    []map[string]string `json:"providers,omitempty"`
-	Target       []string            `json:"target,omitempty"`
+	Name      string              `json:"name,omitempty"`
+	Framework string              `json:"framework,omitempty"`
+	Stencils  []map[string]string `json:"stencils,omitempty"`
+	Target    []string            `json:"target,omitempty"`
 }
 
 func NewConfig(path string) (Config, error) {

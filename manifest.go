@@ -1,76 +1,92 @@
 package fastfood
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
+	"path"
+	"path/filepath"
 	"strings"
+
+	"github.com/jarosser06/fastfood/common/json"
 )
 
-const cookbookTemplates = "cookbook"
+const templatePackAPI = 1
 
 type Manifest struct {
-	Providers map[string]struct {
-		Name          string `json:"name"`
-		Manifest      string `json:"manifest"`
+	API         int `json:"api"`
+	Framework   string
+	Path        string
+	StencilSets map[string]struct {
+		Name          string
+		Manifest      string
 		Help          string `json:"help"`
 		templatesPath string
-	}
+	} `json:"stencil_sets"`
 
-	Cookbook struct {
-		Directories   []string `json:"directories"`
-		Files         []string `json:"files"`
-		TemplatesPath string   `json:"templates_path"`
+	Base struct {
+		Files       []string `json:"files"`
+		Directories []string `json:"directories"`
 	}
 }
 
-func (m *Manifest) Help() string {
-	var providersHelp []string
+func NewManifest(mpath string) (Manifest, error) {
 
-	for name, provider := range m.Providers {
+	var m Manifest
+
+	f, err := ioutil.ReadFile(mpath)
+	if err != nil {
+		return m, fmt.Errorf("reading manifest %s: %v", mpath, err)
+	}
+
+	err = json.Unmarshal(f, &m)
+	if err != nil {
+		return m, fmt.Errorf("parsing manifest %s: %v", mpath, err)
+	}
+
+	// Set helpful values for stencilsets
+	for n, _ := range m.StencilSets {
+		tmp := m.StencilSets[n]
+		tmp.Name = n
+		tmp.Manifest = path.Join(
+			filepath.Dir(mpath),
+			"stencils",
+			n,
+			"manifest.json",
+		)
+		m.StencilSets[n] = tmp
+	}
+
+	return m, nil
+}
+
+func (m *Manifest) Help() string {
+	var shelp []string
+
+	for n, s := range m.StencilSets {
 		var help string
-		if provider.Help == "" {
+		if s.Help == "" {
 			help = "NO HELP FOUND"
 		} else {
-			help = provider.Help
+			help = s.Help
 		}
 
-		providersHelp = append(
-			providersHelp,
-			fmt.Sprintf("  %-15s - %s", name, help),
+		shelp = append(
+			shelp,
+			fmt.Sprintf("  %-15s - %s", n, help),
 		)
 	}
 
 	return fmt.Sprintf(`
-Available Providers:
+Available Stencil Sets:
 
 %s
-`, strings.Join(providersHelp, "\n"))
+`, strings.Join(shelp, "\n"))
 }
 
-func NewManifest(path string) (Manifest, error) {
-
-	var manifest Manifest
-
-	f, err := ioutil.ReadFile(path)
-	if err != nil {
-		return manifest, errors.New(
-			fmt.Sprintf("reading manifest %s: %v", path, err),
-		)
+func (m *Manifest) Valid() (bool, error) {
+	if m.API != templatePackAPI {
+		return false, fmt.Errorf("template pack api version %d not compatible with %d", m.API, templatePackAPI)
 	}
 
-	err = json.Unmarshal(f, &manifest)
-	if err != nil {
-		return manifest, errors.New(
-			fmt.Sprintf("parsing manifest %s: %v", path, err),
-		)
-	}
-
-	if manifest.Cookbook.TemplatesPath == "" {
-		manifest.Cookbook.TemplatesPath = cookbookTemplates
-	}
-
-	return manifest, nil
-
+	return true, nil
 }

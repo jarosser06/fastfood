@@ -2,7 +2,9 @@
 
 case $1 in
 "test")
-  pkg_dirs="cmd"
+  pkg_dirs="framework common/fileutil common/stringutil common/maputil framework"
+
+  go test
 
   for dir in $pkg_dirs
   do
@@ -10,8 +12,6 @@ case $1 in
     go test
     popd &> /dev/null
   done
-
-  go test
   ;;
 "build")
   mkdir -p ${GOPATH}/src/github.com/jarosser06

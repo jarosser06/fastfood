@@ -15,7 +15,7 @@ func TestNewConfig(t *testing.T) {
 		t.Errorf("Expected name to be testcookbook")
 	}
 
-	if config.Providers[0]["provider"] != "rabbitmq" {
-		t.Errorf("Expected first provider to be database")
+	if config.Stencils[0]["stencil_set"] != "rabbitmq" {
+		t.Errorf("Expected first provider to be rabbitmq")
 	}
 }

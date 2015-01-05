@@ -1,13 +1,9 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
-
-	"github.com/jarosser06/fastfood"
-	"github.com/jarosser06/fastfood/common/fileutil"
 )
 
 const (
@@ -22,46 +18,6 @@ type Common struct {
 	TemplatePack string
 	CookbookPath string
 	Force        bool
-	Manifest     fastfood.Manifest
-}
-
-type ProviderMap map[string]fastfood.Provider
-
-// Load the core manifest so we can provide
-// dynamic help options
-func (c *Common) LoadManifest() error {
-	baseManifest := path.Join(c.TemplatePack, "manifest.json")
-	if !fileutil.FileExist(baseManifest) {
-		return fmt.Errorf("Error no such file %s\n", baseManifest)
-	}
-
-	var err error
-	c.Manifest, err = fastfood.NewManifest(baseManifest)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-//Load all providers into memory
-func (c *Common) LoadProviders(cookbook fastfood.Cookbook) (ProviderMap, error) {
-	providerMap := make(ProviderMap)
-
-	for name, provider := range c.Manifest.Providers {
-		p, err := fastfood.NewProviderFromFile(
-			cookbook,
-			path.Join(c.TemplatePack, provider.Manifest),
-		)
-
-		if err != nil {
-			return providerMap, fmt.Errorf("error loading provider from manifest %v", err)
-		}
-
-		providerMap[name] = p
-	}
-
-	return providerMap, nil
 }
 
 // Translates key:value strings into a map
