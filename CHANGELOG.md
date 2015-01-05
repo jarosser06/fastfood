@@ -1,5 +1,8 @@
 ## 0.2.0 (Unreleased)
 
+* Reworked internal API to allow for future frameworks
+* Added API versions to stencils and templatepack manifests
+* Moved all stencils to stencils directory to avoid confusion
 * Split fastfood util into seperate packages stringutil and fileutil
 * Cookbooks built or modified with a json config have the config
   added to the cookbook if it does not already exist.
