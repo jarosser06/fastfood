@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"strings"
@@ -43,37 +44,12 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 
 	if PathIsCookbook(cookbookPath) {
 		f, err := os.Open(path.Join(cookbookPath, "metadata.rb"))
-
 		if err != nil {
 			return cookbook, fmt.Errorf("cookbook.NewCookbookFromPath: %v", err)
 		}
-
 		defer f.Close()
 
-		// TODO: This should be cleaned up and stuck elsewhere
-		scanner := bufio.NewScanner(f)
-		scanner.Split(bufio.ScanWords)
-
-		depFlag := false
-		nameFlag := false
-
-		for scanner.Scan() {
-			switch {
-			case depFlag:
-				cookbook.Dependencies = append(
-					cookbook.Dependencies,
-					strings.Trim(scanner.Text(), "'"),
-				)
-				depFlag = false
-			case nameFlag:
-				cookbook.Name = strings.Trim(scanner.Text(), "'")
-				nameFlag = false
-			case scanner.Text() == "depends":
-				depFlag = true
-			case scanner.Text() == "name":
-				nameFlag = true
-			}
-		}
+		cookbook.ParseMetadata(f)
 
 		if !(len(cookbook.Name) > 0) {
 			return cookbook, errors.New("unable to determine cookbook name")
@@ -85,6 +61,26 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 		return cookbook, errors.New(
 			fmt.Sprintf("%s is not a cookbook", cookbookPath),
 		)
+	}
+}
+
+func (c *Cookbook) ParseMetadata(r io.Reader) {
+	s := bufio.NewScanner(r)
+	s.Split(bufio.ScanWords)
+
+	for s.Scan() {
+		switch s.Text() {
+		case "name":
+			// Pick up the name
+			s.Scan()
+			c.Name = strings.Trim(s.Text(), "'")
+		case "depends":
+			s.Scan()
+			c.Dependencies = append(
+				c.Dependencies,
+				strings.Trim(s.Text(), "'"),
+			)
+		}
 	}
 }
 
