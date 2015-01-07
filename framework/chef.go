@@ -116,6 +116,9 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 		cfile = strings.Replace(cfile, "<NAME>", tOpts.Options["Name"], 1)
 		tfile = path.Join(stencilset.BasePath, tfile)
 
+		// Make sure the path exists before attempting to write the file
+		c.genDirs([]string{path.Dir(cfile)})
+
 		var pContent []string
 		for _, partial := range pfiles {
 			b, err := ioutil.ReadFile(path.Join(stencilset.BasePath, partial))
