@@ -1,5 +1,6 @@
-## 0.2.0 (Unreleased)
+## 0.2.0 (8 Jan 2015)
 
+* Basic support for berks dependency handling
 * Reworked internal API to allow for future frameworks
 * Added API versions to stencils and templatepack manifests
 * Moved all stencils to stencils directory to avoid confusion
