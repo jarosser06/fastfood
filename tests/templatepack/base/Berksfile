@@ -1,7 +1,3 @@
 source 'https://api.berkshelf.com'
 
-|{range $cookbook := .Berks }|
-cookbook |{$cookbook}|
-|{end}|
-
 metadata

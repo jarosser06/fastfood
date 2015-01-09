@@ -2,12 +2,16 @@ package chef
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	"github.com/jarosser06/fastfood/common/fileutil"
 )
 
 type BerksFile struct {
-	Cookbooks []BerksCookbook
+	Cookbooks map[string]BerksCookbook
 }
 
 type BerksCookbook struct {
@@ -19,7 +23,7 @@ type BerksCookbook struct {
 
 // Read a berkshelf file and return a berks struct
 func BerksFromFile(f string) (BerksFile, error) {
-	var b BerksFile
+	b := BerksFile{Cookbooks: make(map[string]BerksCookbook)}
 
 	r, err := os.Open(f)
 	if err != nil {
@@ -32,6 +36,21 @@ func BerksFromFile(f string) (BerksFile, error) {
 	return b, nil
 }
 
+func (c *BerksCookbook) String() string {
+	s := fmt.Sprintf("cookbook \"%s\"", c.Name)
+	if c.Git != "" {
+		s = fmt.Sprintf("%s, git: \"%s\"", s, c.Git)
+
+		if c.Revision != "" {
+			s = fmt.Sprintf("%s, revision: \"%s\"", s, c.Revision)
+		}
+	} else if c.Path != "" {
+		s = fmt.Sprintf("%s, path: \"%s\"", s, c.Path)
+	}
+
+	return s
+}
+
 // Parse the Berksfile
 func (b *BerksFile) Parse(r io.Reader) {
 	s := bufio.NewScanner(r)
@@ -41,14 +60,37 @@ func (b *BerksFile) Parse(r io.Reader) {
 		switch s.Text() {
 		case "cookbook":
 			s.Scan()
-			c := BerksCookbook{Name: s.Text()}
-			b.Cookbooks = append(b.Cookbooks, c)
+
+			cName := strings.Trim(s.Text(), "',\"")
+			c := BerksCookbook{Name: cName}
+			b.Cookbooks[cName] = c
 		}
 	}
 }
 
 // Append Dependencies to a Berksfile
-func (b *BerksFile) Append(deps []BerksCookbook) []string {
+func (b *BerksFile) Append(f string, deps []BerksCookbook) []string {
+	var added []string
+	var buffer []string
 
-	return []string{}
+	if len(deps) == 0 {
+		return added
+	}
+
+	for _, d := range deps {
+		if _, ok := b.Cookbooks[d.Name]; !ok {
+			b.Cookbooks[d.Name] = d
+			added = append(added, d.Name)
+			buffer = append(buffer, d.String())
+		}
+	}
+
+	if len(added) > 0 {
+		fileutil.AppendFile(
+			f,
+			fmt.Sprintf("%s\n", strings.Join(buffer, "\n")),
+		)
+	}
+
+	return added
 }

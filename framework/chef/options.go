@@ -47,6 +47,12 @@ func NewOptions(conf []byte) (Options, error) {
 		return newOptions, fmt.Errorf("parsing json %v", err)
 	}
 
+	// Make sure the name is set
+	for n, d := range newOptions.BerksDeps {
+		d.Name = n
+		newOptions.BerksDeps[n] = d
+	}
+
 	if newOptions.Files == nil {
 		newOptions.Files = make(map[string]string)
 	}
