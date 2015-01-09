@@ -8,10 +8,10 @@ import (
 )
 
 type Options struct {
-	BerksDeps    map[string]Berks  `json:"berks_dependencies"`
-	Dependencies []string          `json:"dependencies"`
-	Directories  []string          `json:"directories"`
-	Files        map[string]string `json:"files"`
+	BerksDeps    map[string]BerksCookbook `json:"berks_dependencies"`
+	Dependencies []string                 `json:"dependencies"`
+	Directories  []string                 `json:"directories"`
+	Files        map[string]string        `json:"files"`
 	Partials     []string
 }
 
