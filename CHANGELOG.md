@@ -1,3 +1,7 @@
+## 0.2.1 (8 Jan 2015)
+
+* Fixed bad message when new cookbook is created
+
 ## 0.2.0 (8 Jan 2015)
 
 * Basic support for berks dependency handling
