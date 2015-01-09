@@ -63,7 +63,7 @@ func (c *Creator) Run(args []string) int {
 		return 1
 	}
 
-	fmt.Println("cookbook %s created", name)
+	fmt.Printf("%s created\n", name)
 	return 0
 }
 
