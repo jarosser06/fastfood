@@ -21,7 +21,7 @@ type OSTarget struct {
 
 type Cookbook struct {
 	*fastfood.Helpers
-	Berks        []string
+	Berks        BerksFile
 	Dependencies []string
 	Name         string
 	Path         string
@@ -32,9 +32,10 @@ type Cookbook struct {
 // Returns a new empty cookbook
 func NewCookbook(cookbookPath string, name string) Cookbook {
 	return Cookbook{
-		Year: time.Now().Year(),
-		Path: path.Join(cookbookPath, name),
-		Name: name,
+		Year:  time.Now().Year(),
+		Path:  path.Join(cookbookPath, name),
+		Berks: BerksFile{},
+		Name:  name,
 	}
 }
 
@@ -53,6 +54,12 @@ func NewCookbookFromPath(cookbookPath string) (Cookbook, error) {
 
 		if !(len(cookbook.Name) > 0) {
 			return cookbook, errors.New("unable to determine cookbook name")
+		}
+
+		// If we find a berksfile lets parse it
+		berksFile := path.Join(cookbookPath, "Berksfile")
+		if fileutil.FileExist(berksFile) {
+			cookbook.Berks, _ = BerksFromFile(berksFile)
 		}
 
 		cookbook.Path = cookbookPath

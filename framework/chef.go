@@ -143,6 +143,15 @@ func (c *Chef) GenerateStencil(name string, stencilset fastfood.StencilSet, opts
 	}
 	c.cookbook.AppendDependencies(chefOpts.Dependencies)
 
+	//TODO: Clean up this mess
+	// Convert berks map to slice
+	var bSlice []chef.BerksCookbook
+	for _, b := range chefOpts.BerksDeps {
+		bSlice = append(bSlice, b)
+	}
+
+	c.cookbook.Berks.Append(path.Join(c.cookbook.Path, "Berksfile"), bSlice)
+
 	return moddedFiles, nil
 }
 

@@ -8,10 +8,10 @@ import (
 )
 
 type Options struct {
-	BerksDeps    map[string]Berks  `json:"berks_dependencies"`
-	Dependencies []string          `json:"dependencies"`
-	Directories  []string          `json:"directories"`
-	Files        map[string]string `json:"files"`
+	BerksDeps    map[string]BerksCookbook `json:"berks_dependencies"`
+	Dependencies []string                 `json:"dependencies"`
+	Directories  []string                 `json:"directories"`
+	Files        map[string]string        `json:"files"`
 	Partials     []string
 }
 
@@ -30,6 +30,8 @@ func Merge(global Options, local Options) Options {
 		} else {
 			o.BerksDeps = local.BerksDeps
 		}
+	} else if global.BerksDeps != nil {
+		o.BerksDeps = global.BerksDeps
 	}
 
 	o.Files = maputil.Merge(local.Files, global.Files)
@@ -45,6 +47,12 @@ func NewOptions(conf []byte) (Options, error) {
 	err := json.Unmarshal(conf, &newOptions)
 	if err != nil {
 		return newOptions, fmt.Errorf("parsing json %v", err)
+	}
+
+	// Make sure the name is set
+	for n, d := range newOptions.BerksDeps {
+		d.Name = n
+		newOptions.BerksDeps[n] = d
 	}
 
 	if newOptions.Files == nil {
