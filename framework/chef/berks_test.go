@@ -40,6 +40,19 @@ func TestBerksAppend(t *testing.T) {
 	}
 }
 
+func TestBerksAppend_withEmptySlice(t *testing.T) {
+	tmpFile := "/tmp/Berksfile"
+	fileutil.Copy(berksTestFile, tmpFile)
+
+	defer os.Remove(tmpFile)
+
+	b, _ := BerksFromFile(tmpFile)
+
+	var newDeps []BerksCookbook
+
+	b.Append(tmpFile, newDeps)
+}
+
 func TestBerksAppend_wontDup(t *testing.T) {
 	tmpFile := "/tmp/Berksfile"
 	fileutil.Copy(berksTestFile, tmpFile)

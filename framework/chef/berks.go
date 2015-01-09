@@ -77,6 +77,11 @@ func (b *BerksFile) Append(f string, deps []BerksCookbook) []string {
 		return added
 	}
 
+	// Catches issue with Cookbooks not being created
+	if b.Cookbooks == nil {
+		b.Cookbooks = make(map[string]BerksCookbook)
+	}
+
 	for _, d := range deps {
 		if _, ok := b.Cookbooks[d.Name]; !ok {
 			b.Cookbooks[d.Name] = d

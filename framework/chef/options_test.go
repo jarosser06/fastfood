@@ -28,6 +28,9 @@ var globalOptions = `
 	"dependencies": [
 		"rackspace_iptables"
 	],
+	"berks_dependencies": {
+		"git": {}
+	},
 	"directories": [
 		"templates"
 	]
@@ -49,7 +52,7 @@ func TestNewOptions(t *testing.T) {
 	}
 }
 
-func TestMerge(t *testing.T) {
+func TestMergeOptions(t *testing.T) {
 	l, _ := NewOptions([]byte(localOptions))
 	g, _ := NewOptions([]byte(globalOptions))
 
@@ -59,7 +62,7 @@ func TestMerge(t *testing.T) {
 		t.Errorf("expected 2 dependencies after merge, got %d", len(merged.Dependencies))
 	}
 
-	if len(merged.BerksDeps) != 1 {
-		t.Errorf("expected 1 berks dependency, got %d", len(merged.BerksDeps))
+	if len(merged.BerksDeps) != 2 {
+		t.Errorf("expected 2 berks dependency, got %d", len(merged.BerksDeps))
 	}
 }

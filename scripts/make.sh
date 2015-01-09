@@ -2,7 +2,7 @@
 
 case $1 in
 "test")
-  pkg_dirs="framework common/fileutil common/stringutil common/maputil framework"
+  pkg_dirs="common/fileutil common/stringutil common/maputil framework framework/chef"
 
   go test
 

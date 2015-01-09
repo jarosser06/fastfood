@@ -30,6 +30,8 @@ func Merge(global Options, local Options) Options {
 		} else {
 			o.BerksDeps = local.BerksDeps
 		}
+	} else if global.BerksDeps != nil {
+		o.BerksDeps = global.BerksDeps
 	}
 
 	o.Files = maputil.Merge(local.Files, global.Files)
