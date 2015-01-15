@@ -3,6 +3,9 @@ fastfood
 
 Makes Cookbooks faster by pre-templating them
 
+This tool is still under heavy development and tbh for the vast majority
+of people out there it will be uninteresting and unuseful.
+
 ###Hacking
 This tool uses gpm for dependency management so you need to
 ensure that it is installed in order to build from source.
