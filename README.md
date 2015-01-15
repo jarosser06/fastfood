@@ -6,6 +6,9 @@ Makes Cookbooks faster by pre-templating them
 This tool is still under heavy development and tbh for the vast majority
 of people out there it will be uninteresting and unuseful.
 
+For a template pack test play around with try:
+https://github.com/the-galley/chef-templatepack
+
 ###Hacking
 This tool uses gpm for dependency management so you need to
 ensure that it is installed in order to build from source.
@@ -43,9 +46,9 @@ Create an empty cookbookk:
 fastfood new mycookbook
 ```
 
-Generate a set of recipes, etc where app is the provider:
+Generate a set of recipes, etc where app is the stencil set:
 ```shell
-fastfood gen app name:application1 type:python repo:git@github.com/cus/app1
+fastfood gen app name:application1 stencil:python repo:git@github.com/cus/app1
 ```
 
 Build/modify an existing cookbook from a config:
@@ -57,17 +60,17 @@ Uses a json config file to allow for pre-templating cookbooks:
 ```json
 {
   "name": "123456-customer",
-  "providers": [
+  "stencils": [
     {
-      "provider": "django_app",
+      "stencil_set": "django_app",
       "name": "application1",
-      "type": "nginx",
+      "stencil": "nginx",
       "repo": "git@github.com:customer/application1",
       "root": "/var/www"
     },
     {
       "name": "application2",
-      "type": "nodejs",
+      "stencil": "nodejs",
       "repo": "github.com:customer/application2",
       "docroot": "/var/www/application2"
     }
