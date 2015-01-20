@@ -21,9 +21,10 @@ type Chef struct {
 // Initializes a framework with options
 func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
 	c.options = frameworkOptions
-	if chef.PathIsCookbook(c.options.Destination) {
+	cpath := path.Join(c.options.Destination, c.options.Name)
+	if chef.PathIsCookbook(cpath) {
 		var err error
-		c.cookbook, err = chef.NewCookbookFromPath(c.options.Destination)
+		c.cookbook, err = chef.NewCookbookFromPath(cpath)
 		if err != nil {
 			return err
 		}
@@ -31,7 +32,6 @@ func (c *Chef) Init(frameworkOptions fastfood.FrameworkOptions) error {
 		return nil
 	}
 
-	cpath := path.Join(c.options.Destination, c.options.Name)
 	// Create cookbook
 	if fileutil.FileExist(cpath) {
 		var err error
