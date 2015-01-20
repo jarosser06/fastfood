@@ -1,3 +1,7 @@
+## 0.2.2 (20 Jan 2015)
+
+* Fixed bug that broke the new command
+
 ## 0.2.1 (8 Jan 2015)
 
 * Fixed bad message when new cookbook is created
