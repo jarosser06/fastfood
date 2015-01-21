@@ -106,7 +106,7 @@ CMDFound:
 
 	updatedFiles, err := c.GenerateStencil(stencil, s, mappedArgs)
 	if err != nil {
-		fmt.Printf("Error generating files %v\n", err)
+		fmt.Printf("%v\n", err)
 		return 1
 	}
 
