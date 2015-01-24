@@ -35,20 +35,8 @@ case $1 in
   done
   ;;
 "install")
-  platform=$(uname)
-
-  case $platform in
-  "Linux")
-    cp doc/manpage ${INSTALLPRE}/share/man/man1/fastfood.1
-    cp bin/linux_amd64/fastfood ${INSTALLPRE}/bin/
-    ;;
-  "Darwin")
-    cp doc/manpage ${INSTALLPRE}/share/man/man1/fastfood.1
-    cp bin/darwin_amd64/fastfood ${INSTALLPRE}/bin/
-    ;;
-  *)
-    echo "Unsuported platform for make install"
-  esac
+  cp doc/manpage ${INSTALLPRE}/share/man/man1/fastfood.1
+  cp bin/fastfood ${INSTALLPRE}/bin/
 
   ;;
 esac
