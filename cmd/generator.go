@@ -133,7 +133,7 @@ Usage: fastfood gen <flags> [provider] [options]
   name:recipe_name
 
 Flags:
-  -template-pack=<path> - path to the template pack
+  -template-pack <path> - path to the template pack
   -force                - overwrite any existing files
 `
 }

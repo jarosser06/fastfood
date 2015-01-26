@@ -134,7 +134,7 @@ Usage: fastfood build [config_file]
   This will create/modify a cookbook and providers.
 
 Flags:
-  -template-pack=<path>   - path to the template pack
-  -cookbooks-path=<path>  - path to the cookbooks directory
+  -template-pack <path>   - path to the template pack
+  -cookbooks-path <path>  - path to the cookbooks directory
 `
 }

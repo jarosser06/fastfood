@@ -17,8 +17,8 @@ func (c *Creator) Help() string {
 Usage: fastfood new <flags> [cookbook_name]
 
 Flags:
-  -template-pack=<path>  - path to the template pack
-  -cookbooks-path=<path> - path to the cookbooks directory
+  -template-pack <path>  - path to the template pack
+  -cookbooks-path <path> - path to the cookbooks directory
 `
 }
 
