@@ -111,11 +111,11 @@ func (s *StencilSet) Valid() (bool, error) {
 }
 
 // Merge all of the options from a given map with the defaults from the
-// type and provider
+// stencil and stencilset
 func (s *StencilSet) MergeOpts(stencil string, opts map[string]string) map[string]string {
 
 	// Merge type options first
-	// Gives the ability to override provider global options
+	// Gives the ability to override stencilset global options
 	for name, val := range s.Stencils[stencil].Opts {
 		if _, ok := opts[name]; !ok {
 			if v := val.DefaultValue; v != "" {
@@ -139,7 +139,7 @@ func (s *StencilSet) MergeOpts(stencil string, opts map[string]string) map[strin
 	return opts
 }
 
-// Print Provider help
+// Print stencilset help
 func (s *StencilSet) Help() string {
 	var globalOpts, stencils []string
 	for name, opt := range s.Opts {

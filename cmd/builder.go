@@ -124,14 +124,14 @@ func (b *Builder) Run(args []string) int {
 }
 
 func (b *Builder) Synopsis() string {
-	return "Creates a cookbook w/ providers from a config file"
+	return "Creates a cookbook w/ stencilss from a config file"
 }
 
 func (b *Builder) Help() string {
 	return `
 Usage: fastfood build [config_file]
 
-  This will create/modify a cookbook and providers.
+  This will create/modify a cookbook and stencils.
 
 Flags:
   -template-pack <path>   - path to the template pack

@@ -66,7 +66,7 @@ func (g *Generator) Run(args []string) int {
 	}
 
 	// If the loop finishes without finding the commnad exit
-	fmt.Printf("No provider found for %s\n", setName)
+	fmt.Printf("No stencilset found for %s\n", setName)
 	return 1
 
 	// Command was found continue to execute
@@ -123,10 +123,10 @@ func (g *Generator) Synopsis() string {
 // Autogenerate based on commands parsed
 func (g *Generator) Help() string {
 	return `
-Usage: fastfood gen <flags> [provider] [options]
+Usage: fastfood gen <flags> [stencilset] [options]
   This will generate a recipe and spec file
-  based on the provider and options you
-  provide that provider.
+  based on the stencilset and options you
+  provide that stencilset.
   Options are passed using using a key:value
   notation so to set the name you would use
   the following:
