@@ -124,7 +124,7 @@ func (b *Builder) Run(args []string) int {
 }
 
 func (b *Builder) Synopsis() string {
-	return "Creates a cookbook w/ stencilss from a config file"
+	return "Creates a cookbook w/ stencils from a config file"
 }
 
 func (b *Builder) Help() string {
