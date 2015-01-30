@@ -18,40 +18,47 @@ get used over the defaults.
 .SH COMMANDS
 .SS NEW
 .B fastfood new
-[\fB-cookbooks-dir=\fR\fICOOKBOOKSDIR\fR]
+[\fB-cookbooks-dir \fR\fICOOKBOOKSDIR\fR]
 [COOKBOOKNAME]
 
 .SS GEN
 .B fastfood gen
-[\fB-template-pack=\fR\fIPATH\fI]
-[\fIPROVIDER\fR]
+[\fB-template-pack \fR\fIPATH\fI]
+[\fISTENCILSET\fR]
 .IR options ...
+
+.SS BUILD
+.B fastfood build
+[\fB-template-pack \fR\fIPATH\fI]
+[\fB-cookbooks-dir \fR\fIPATH\fI]
+[\fIJSONTEMPLATE\fR]
 
 .SH NOTES
 \-
-All provider options are passed using a key:value notation.
+All stencil options are passed using a key:value notation.
 \n
 \-
 Node attributes using node['*'] and node.* passed should render
-correctly without being wrapped in quotes.
+correctly without being wrapped in quotes if the stencil author
+used the QSTRING helper.
 .SH MANIFESTS
 .SS BASE
 The base manifest is found at the root of the template pack.  This
 manifest is how fastfood knows what cookbook files to generate
-and what providers are available to it.
+and what stencil setss are available to it.
 \n
 A sample base manifest:
 \n
 .P
 {
-  "providers": {
-    "a_provider": {
-      "name": "a_provider",
-      "manifest": "a_provider/manifest.json",
-      "help": "Some info about the provider"
+  "api": 1,
+  "framework": "chef",
+  "stencil_sets": {
+    "a_stencilset": {
+      "help": "Some info about the stencilset"
     }
   },
-  "cookbook": {
+  "base": {
     "files": [
       "metadata.rb",
       "README.md"
@@ -69,32 +76,33 @@ A sample base manifest:
 
 }
 .B
-.SS PROVIDER
-The provider manifest describes a provider and all of the available
-types in that provider.  There is no restriction on naming a provider,
-how many options a provider can have or even how many types a provider
-can have.  A providers types also have the ability to override option
-defaults.
+.SS Stencil Set
+The stencil set manifest describes a stencil set and all of the available
+stencils in that set.  There is no restriction on naming a stencil set,
+how many options a stencil can have or even how many stencils a set
+can have.  A stencil also has the ability to override option defaults.
 \n
-A provider type's files takes a map with the name of the file to be
+A stencil set's files takes a map with the name of the file to be
 written as the key and the template file included in the pack as
 the argument.
 \n
-A Sample provider manifest:
+A Sample stencil manifest:
 .P
 {
   "id": "webserver",
-  "default_type": "nginx",
+  "api": 1,
+  "framework": "chef",
+  "default_stencil": "nginx",
   "dependencies": [
-    "iptables",
+    "iptables"
   ],
   "options": {
     "name":" {
       "help": "Name of the recipe to create",
-      "default": "my_provider"
+      "default": "my_stencil"
     }
   },
-  "types": {
+  "stencils": {
     "nginx": {
       "dependencies": [
         "nginx"
