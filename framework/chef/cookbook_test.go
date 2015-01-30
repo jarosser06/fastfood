@@ -58,7 +58,11 @@ func TestNewCookbookFromPath(t *testing.T) {
 
 func TestAppendDependencies(t *testing.T) {
 	c, _ := NewCookbookFromPath(testCookbook)
-	appended := c.AppendDependencies([]string{"couchdb", "mongodb"})
+	deps := map[string]CookbookDependency{
+		"couchdb": {Name: "couchdb"},
+		"mongodb": {Name: "mongodb"},
+	}
+	appended := c.AppendDependencies(deps)
 
 	if len(appended) != 2 {
 		t.Errorf("expected 2 dependencies to be added")
@@ -68,7 +72,7 @@ func TestAppendDependencies(t *testing.T) {
 		t.Errorf("expected 3 dependencies to be added to cookbook struct")
 	}
 
-	appended = c.AppendDependencies([]string{"couchdb", "mongodb"})
+	appended = c.AppendDependencies(deps)
 	if len(appended) != 0 {
 		t.Errorf("expected AppendDependencies to have 0 elements")
 	}

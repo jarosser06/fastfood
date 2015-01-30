@@ -9,9 +9,9 @@ var localOptions = `
 			"git": "git@github.com:jarosser06/couchdb-cookbook.git"
 		}
 	},
-	"dependencies": [
-		"couchdb"
-	],
+	"dependencies": {
+		"couchdb": {}
+	},
 	"directories": [
 		"recipes"
 	],
@@ -25,9 +25,9 @@ var localOptions = `
 
 var globalOptions = `
 {
-	"dependencies": [
-		"rackspace_iptables"
-	],
+	"dependencies": {
+		"rackspace_iptables": {}
+	},
 	"berks_dependencies": {
 		"git": {}
 	},
