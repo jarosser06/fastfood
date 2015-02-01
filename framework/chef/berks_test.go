@@ -64,6 +64,7 @@ func TestBerksAppend_wontDup(t *testing.T) {
 	newDeps := []BerksCookbook{
 		BerksCookbook{Name: "apt"},
 		BerksCookbook{Name: "apache", Git: "https://github.com/viverae-cookbooks/apache2"},
+		BerksCookbook{Name: "couchdb", Git: "https://github.com/the-galley/chef-couchdb", Ref: "88a9afa3b7e29ce987d7f4f43df5d2070491ed05"},
 	}
 
 	// This run returns 1

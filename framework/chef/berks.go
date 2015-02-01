@@ -15,10 +15,13 @@ type BerksFile struct {
 }
 
 type BerksCookbook struct {
+	Branch   string `json:"branch"`
 	Name     string `json:"name"`
 	Git      string `json:"git"`
 	Path     string `json:"path"`
+	Ref      string `json:"ref"`
 	Revision string `json:"revision"`
+	Tag      string `json:"tag"`
 }
 
 // Read a berkshelf file and return a berks struct
@@ -41,9 +44,17 @@ func (c *BerksCookbook) String() string {
 	if c.Git != "" {
 		s = fmt.Sprintf("%s, git: \"%s\"", s, c.Git)
 
-		if c.Revision != "" {
+		switch {
+		case c.Branch != "":
+			s = fmt.Sprintf("%s, branch: \"%s\"", s, c.Branch)
+		case c.Ref != "":
+			s = fmt.Sprintf("%s, ref: \"%s\"", s, c.Ref)
+		case c.Revision != "":
 			s = fmt.Sprintf("%s, revision: \"%s\"", s, c.Revision)
+		case c.Tag != "":
+			s = fmt.Sprintf("%s, tag: \"%s\"", s, c.Tag)
 		}
+
 	} else if c.Path != "" {
 		s = fmt.Sprintf("%s, path: \"%s\"", s, c.Path)
 	}
