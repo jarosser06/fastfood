@@ -112,7 +112,7 @@ func PathIsCookbook(cookbookPath string) bool {
 func (d *CookbookDependency) String() string {
 	dep := fmt.Sprintf("depends %s", stringutil.Wrap(d.Name, "'"))
 	if len(d.Options) > 0 {
-		for i := 0; i < len(dep); i++ {
+		for i := 0; i < len(d.Options); i++ {
 			o := d.Options[i]
 			d.Options[i] = stringutil.Wrap(o, "'")
 		}
@@ -140,6 +140,7 @@ func (c *Cookbook) AppendDependencies(dependencies map[string]CookbookDependency
 			if !exist {
 				// Keep track of all new dependencies
 				c.Dependencies[dep.Name] = dep
+				newDeps = append(newDeps, dep.Name)
 				depBuffer = append(depBuffer, dep.String())
 			}
 		}

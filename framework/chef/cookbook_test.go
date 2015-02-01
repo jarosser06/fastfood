@@ -59,7 +59,7 @@ func TestNewCookbookFromPath(t *testing.T) {
 func TestAppendDependencies(t *testing.T) {
 	c, _ := NewCookbookFromPath(testCookbook)
 	deps := map[string]CookbookDependency{
-		"couchdb": {Name: "couchdb"},
+		"couchdb": {Name: "couchdb", Options: []string{">= 2.5.3"}},
 		"mongodb": {Name: "mongodb"},
 	}
 	appended := c.AppendDependencies(deps)
