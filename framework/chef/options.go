@@ -68,6 +68,11 @@ func NewOptions(conf []byte) (Options, error) {
 		newOptions.BerksDeps[n] = d
 	}
 
+	for n, d := range newOptions.Dependencies {
+		d.Name = n
+		newOptions.Dependencies[n] = d
+	}
+
 	if newOptions.Files == nil {
 		newOptions.Files = make(map[string]string)
 	}
