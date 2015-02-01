@@ -12,6 +12,7 @@ import (
 
 	"github.com/jarosser06/fastfood"
 	"github.com/jarosser06/fastfood/common/fileutil"
+	"github.com/jarosser06/fastfood/common/stringutil"
 )
 
 type OSTarget struct {
@@ -22,20 +23,26 @@ type OSTarget struct {
 type Cookbook struct {
 	*fastfood.Helpers
 	Berks        BerksFile
-	Dependencies []string
+	Dependencies map[string]CookbookDependency
 	Name         string
 	Path         string
 	Target       OSTarget
 	Year         int
 }
 
+type CookbookDependency struct {
+	Name    string
+	Options []string
+}
+
 // Returns a new empty cookbook
 func NewCookbook(cookbookPath string, name string) Cookbook {
 	return Cookbook{
-		Year:  time.Now().Year(),
-		Path:  path.Join(cookbookPath, name),
-		Berks: BerksFile{},
-		Name:  name,
+		Year:         time.Now().Year(),
+		Path:         path.Join(cookbookPath, name),
+		Berks:        BerksFile{},
+		Name:         name,
+		Dependencies: make(map[string]CookbookDependency),
 	}
 }
 
@@ -75,6 +82,9 @@ func (c *Cookbook) ParseMetadata(r io.Reader) {
 	s := bufio.NewScanner(r)
 	s.Split(bufio.ScanWords)
 
+	// Initialize dependency map
+	c.Dependencies = make(map[string]CookbookDependency)
+
 	for s.Scan() {
 		switch s.Text() {
 		case "name":
@@ -83,10 +93,9 @@ func (c *Cookbook) ParseMetadata(r io.Reader) {
 			c.Name = strings.Trim(s.Text(), "'")
 		case "depends":
 			s.Scan()
-			c.Dependencies = append(
-				c.Dependencies,
-				strings.Trim(s.Text(), "'"),
-			)
+			dName := strings.Trim(s.Text(), "',\"")
+			d := CookbookDependency{Name: dName}
+			c.Dependencies[dName] = d
 		}
 	}
 }
@@ -100,8 +109,21 @@ func PathIsCookbook(cookbookPath string) bool {
 	}
 }
 
+func (d *CookbookDependency) String() string {
+	dep := fmt.Sprintf("depends %s", stringutil.Wrap(d.Name, "'"))
+	if len(d.Options) > 0 {
+		for i := 0; i < len(d.Options); i++ {
+			o := d.Options[i]
+			d.Options[i] = stringutil.Wrap(o, "'")
+		}
+		dep = fmt.Sprintf("%s, %s", dep, strings.Join(d.Options, ","))
+	}
+
+	return dep
+}
+
 // Returns a list of dependencies that were written
-func (c *Cookbook) AppendDependencies(dependencies []string) []string {
+func (c *Cookbook) AppendDependencies(dependencies map[string]CookbookDependency) []string {
 	var depBuffer, newDeps []string
 
 	if len(dependencies) > 0 {
@@ -109,7 +131,7 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 			exist := false
 
 			for _, existing := range c.Dependencies {
-				if existing == dep {
+				if existing.Name == dep.Name {
 					exist = true
 					continue
 				}
@@ -117,8 +139,9 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 
 			if !exist {
 				// Keep track of all new dependencies
-				newDeps = append(newDeps, dep)
-				depBuffer = append(depBuffer, fmt.Sprintf("depends '%s'", dep))
+				c.Dependencies[dep.Name] = dep
+				newDeps = append(newDeps, dep.Name)
+				depBuffer = append(depBuffer, dep.String())
 			}
 		}
 
@@ -130,9 +153,6 @@ func (c *Cookbook) AppendDependencies(dependencies []string) []string {
 			)
 		}
 	}
-
-	// Add the new dependencies to the cookbook interface
-	c.Dependencies = append(c.Dependencies, newDeps...)
 
 	return newDeps
 }

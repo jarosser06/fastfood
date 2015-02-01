@@ -5,9 +5,9 @@
   "berks_dependencies": {
     "database": {}
   },
-  "dependencies": [
-    "rackspace_iptables"
-  ],
+  "dependencies": {
+    "rackspace_iptables": {}
+  },
   "options": {
     "name": {
       "help": "name of the recipe and corresponding test file"
@@ -30,10 +30,10 @@
   },
   "stencils": {
     "mysql_master": {
-      "dependencies": [
-        "database",
-        "mysql-multi"
-      ],
+      "dependencies": {
+        "database": {},
+        "mysql-multi": {}
+      },
       "files": {
         "recipes/<NAME>.rb": "recipes/mysql_master.rb",
         "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_master_spec.rb"
@@ -45,9 +45,9 @@
       }
     },
     "mysql_slave": {
-      "dependencies": [
-        "mysql-multi"
-      ],
+      "dependencies": {
+        "mysql-multi": {}
+      },
       "files": {
         "recipes/<NAME>.rb": "recipes/mysql_slave.rb",
         "test/unit/spec/<NAME>_spec.rb": "test/unit/spec/mysql_slave_spec.rb"

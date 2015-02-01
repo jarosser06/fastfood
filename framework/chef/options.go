@@ -8,10 +8,10 @@ import (
 )
 
 type Options struct {
-	BerksDeps    map[string]BerksCookbook `json:"berks_dependencies"`
-	Dependencies []string                 `json:"dependencies"`
-	Directories  []string                 `json:"directories"`
-	Files        map[string]string        `json:"files"`
+	BerksDeps    map[string]BerksCookbook      `json:"berks_dependencies"`
+	Dependencies map[string]CookbookDependency `json:"dependencies"`
+	Directories  []string                      `json:"directories"`
+	Files        map[string]string             `json:"files"`
 	Partials     []string
 }
 
@@ -19,7 +19,20 @@ type Options struct {
 func Merge(global Options, local Options) Options {
 	o := Options{}
 
-	o.Dependencies = append(global.Dependencies, local.Dependencies...)
+	//o.Dependencies = append(global.Dependencies, local.Dependencies...)
+	if local.Dependencies != nil {
+		if global.Dependencies != nil {
+			o.Dependencies = global.Dependencies
+			for k, v := range local.Dependencies {
+				o.Dependencies[k] = v
+			}
+		} else {
+			o.Dependencies = local.Dependencies
+		}
+	} else if global.Dependencies != nil {
+		o.Dependencies = global.Dependencies
+	}
+
 	// Can't use maputils Merge since its special
 	if local.BerksDeps != nil {
 		if global.BerksDeps != nil {
@@ -53,6 +66,11 @@ func NewOptions(conf []byte) (Options, error) {
 	for n, d := range newOptions.BerksDeps {
 		d.Name = n
 		newOptions.BerksDeps[n] = d
+	}
+
+	for n, d := range newOptions.Dependencies {
+		d.Name = n
+		newOptions.Dependencies[n] = d
 	}
 
 	if newOptions.Files == nil {
