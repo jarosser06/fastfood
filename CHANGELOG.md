@@ -1,3 +1,11 @@
+## 0.3.0 (1 Feb 2015)
+
+* Added support for extra dependency options
+* Added support for tag, branch, and ref for berks dependencies
+* Cleaned up option help to reduce confusion with path expansion
+* Removed remaining references to old naming (stencil set/provider)
+* Error message cleanup
+
 ## 0.2.2 (20 Jan 2015)
 
 * Fixed bug that broke the new command
