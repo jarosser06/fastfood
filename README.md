@@ -1,6 +1,9 @@
 fastfood
 ========
 
+!!!!DEPRECATED!!!!
+Use https://github.com/rackerlabs/fastfood instead
+
 Makes Cookbooks faster by pre-templating them
 
 This tool is still under heavy development and tbh for the vast majority
