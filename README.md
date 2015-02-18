@@ -73,7 +73,7 @@ Uses a json config file to allow for pre-templating cookbooks:
     },
     {
       "name": "application2",
-      "stencil": "nodejs",
+      "stencil_set": "nodejs",
       "repo": "github.com:customer/application2",
       "docroot": "/var/www/application2"
     }
